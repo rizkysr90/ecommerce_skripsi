@@ -6,6 +6,7 @@ import "./index.css";
 import axios from "axios";
 import { persistor, store } from './app/store';
 import { PersistGate } from 'redux-persist/integration/react';
+import 'leaflet/dist/leaflet.css'
 
 axios.defaults.withCredentials = true;
 const container = document.getElementById('root');

@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const loginUser = createAsyncThunk("users/loginUser", async (user, thunkAPI) => {
     try {
-        const response = await axios.post('http://localhost:8080/auth/login', {
+        const response = await axios.post('http://localhost:8080/auth/login/customers', {
             email: user.email,
             password: user.password
         });
@@ -17,7 +17,7 @@ export const loginUser = createAsyncThunk("users/loginUser", async (user, thunkA
 })
 
 export const logoutUser = createAsyncThunk("users/logoutUser", async () => {
-    await axios.delete('http://localhost:8080/auth/logout');
+    await axios.delete('http://localhost:8080/auth/logout/users');
 })
 const initialState = {
     user: null,

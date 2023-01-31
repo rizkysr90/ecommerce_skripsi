@@ -1,11 +1,10 @@
 import React from 'react'
-import { BottomNav } from '../components/BottomNav'
-import { Navbar } from '../components/Navbar'
+import { Navbar } from './Navbar'
 export const Home = () => {
   return (
     <div className='bg-primary-content min-h-screen'>
         <Navbar/>
-        <BottomNav/>
+        {/* <BottomNav/> */}
     </div>
   )
 }

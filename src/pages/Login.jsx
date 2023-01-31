@@ -51,7 +51,7 @@ export const Login = () => {
                             <label className="label" htmlFor='password'>
                                 <span className="label-text">Password</span>
                             </label>
-                            <input type="text" 
+                            <input type="password" 
                                 placeholder="password" 
                                 name='password' 
                                 id="password" 
