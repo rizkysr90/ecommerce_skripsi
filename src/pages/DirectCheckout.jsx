@@ -28,6 +28,27 @@ function DirectCheckout() {
     const [address, setAddress] = useState([]);
     const { user } = useSelector((state) => state.auth);
     const [selectedAddress, setSelectedAddress] = useState("");
+    const handleSubmitOrder = async (e) => {
+        console.log('test');
+        try {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const formJSON = Object.fromEntries(formData.entries());
+
+            formJSON.status = null;
+            formJSON.amount = orderSummary.totalPrice;
+            formJSON.pay_status = null;
+            formJSON.evidence_of_tf = null;
+            formJSON.qty_product = orderSummary.totalQty;
+            formJSON.products = product;
+            console.log(formJSON);
+            const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON);
+            
+        } catch (error) {
+            
+        }
+    }
     useEffect(() => {
         const getData = async () => {
             const res = await axios.get(`${process.env.REACT_APP_API_HOST}/customers/address`);
@@ -43,7 +64,9 @@ function DirectCheckout() {
                     <div className='mx-24 mt-8'>
                         <div className='font-bold text-lg mb-4'>Direct Checkout</div>
                        
-                        <div className='flex'>
+                        <form
+                         onSubmit={handleSubmitOrder}
+                         className='flex'>
                             <div className='basis-8/12'>
                                 <div className="alert shadow">
                                     <div>
@@ -73,7 +96,9 @@ function DirectCheckout() {
                                     })
                                 }
                                 <div className='my-4 text-sm'>Tulis Catatan Pesanan : (Tidak wajib)</div>
-                                <textarea className="textarea w-full textarea-bordered" placeholder="Bio"></textarea>
+                                <textarea className="textarea w-full textarea-bordered" placeholder="Bio" name='notes'
+                                    
+                                ></textarea>
                                 <div className="divider"></div>
                                 <div>
                                     <div className='mb-4 font-bold text-lg'>Pengiriman</div>
@@ -159,15 +184,17 @@ function DirectCheckout() {
                                     </div>
                                     <div>
                                         <div className='font-bold text-sm'>Jenis Pengiriman</div>
-                                        <select className="select select-bordered w-full max-w-xs mt-4">
+                                        <select className="select select-bordered w-full max-w-xs mt-4"
+                                            name='shipping_method'
+                                        >
                                             <option disabled >Pilih Jenis Pengiriman</option>
-                                            <option>Ambil di toko</option>
+                                            <option value={"pickup"}>Ambil di toko</option>
                                             {
                                                 getDistanceFromLatLonInKm(storeGeoLoc.lat, 
                                                     storeGeoLoc.lng, selectedAddress.lat,
                                                      selectedAddress.lng).toFixed(1) < 5 ? 
 
-                                                     <option>Pesan Antar</option>
+                                                     <option value={'delivery order'}>Pesan Antar</option>
                                                      : 
                                                      <option value={''} disabled>Pesan Antar (Jarak Pengiriman &lt; 5 KM)</option>
                                             }
@@ -194,12 +221,14 @@ function DirectCheckout() {
                                         Total Tagihan
                                         <span>Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}</span>
                                     </div>
-                                    <div className='btn btn-secondary w-full text-base-100 normal-case my-8'>
+                                    <button 
+                                    type='submit'
+                                    className='btn btn-secondary w-full text-base-100 normal-case my-8'>
                                             Bayar
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
 
                 </div> : <div>Halaman Tidak Ditemukan</div>
