@@ -1,9 +1,8 @@
-import { faCashRegister, faShoppingBag } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import React from 'react';
 import useSWR from 'swr';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 
 export default function MyOrders() {
   const fetchOrders = async (url) => await axios.get(url).then((res) => res.data.data);
@@ -30,7 +29,7 @@ export default function MyOrders() {
                             }
                             <div className='flex'>
                               <figure className='w-16 h-16 bg-black mt-2'>
-                                  <img src={`${data?.Products[0]?.url_img}`} className='object-cover'/>
+                                  <img src={`${data?.Products[0]?.url_img}`} className='object-cover' alt='gambar produk'/>
                               </figure>
                               <div className='grow flex flex-col ml-4 mt-4 text-xs'>
                                   <div className='font-bold text-sm'>{data?.Products[0]?.name}</div>
@@ -56,7 +55,10 @@ export default function MyOrders() {
                               </div>
                             </div>
                             <div className='flex justify-end mt-2'>
-                                  <div className='btn btn-primary btn-outline btn-sm text-base-100 normal-case'>Lihat Detail Transaksi</div>
+                                  <Link 
+                                  to={data?.id}
+                                  className='btn btn-primary btn-outline btn-sm text-base-100 normal-case'>
+                                  Lihat Detail Transaksi</Link>
                             </div>
                         </div>
                       )

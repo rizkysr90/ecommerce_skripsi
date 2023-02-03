@@ -13,6 +13,7 @@ import LandingPage from './pages/LandingPage';
 import ProductDetails from './pages/ProductDetails';
 import DirectCheckout from './pages/DirectCheckout';
 import MyOrders from './pages/MyOrders';
+import MyOrderDetail from './pages/MyOrderDetail';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/customers/address" element={<ShippingAddress/>} />
             <Route path="/customers/address/new" element={<ShippingAddressNew/>} />
             <Route path="/customers/myorders" element={<MyOrders/>} />
+            <Route path="/customers/myorders/:id" element={<MyOrderDetail/>} />
             <Route path="/admin/dashboard" element={<AdminDashboard/>} />
             <Route path="/auth/register" element={<Register/>} />
             <Route path="/products/:categoryName/:productId" element={<ProductDetails/>}/>
