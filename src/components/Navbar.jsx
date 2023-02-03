@@ -46,7 +46,7 @@ export const Navbar = () => {
                         <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-neutral rounded-box w-52">
                                 <Link to = "/dashboard" className='btn normal-case btn-ghost text-neutral-content'>Profil Saya</Link>
                                 <Link to = "/customers/address" className='btn normal-case btn-ghost text-neutral-content'>Alamat Pengiriman</Link>
-
+                                <Link to = "/customers/myorders" className='btn normal-case btn-ghost text-neutral-content'>Pesanan Saya</Link>
                             <button 
                             onClick={handleLogout}
                             className='btn normal-case btn-ghost text-neutral-content'>Logout</button>

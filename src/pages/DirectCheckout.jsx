@@ -36,10 +36,7 @@ function DirectCheckout() {
             const formData = new FormData(form);
             const formJSON = Object.fromEntries(formData.entries());
 
-            formJSON.status = null;
             formJSON.amount = orderSummary.totalPrice;
-            formJSON.pay_status = null;
-            formJSON.evidence_of_tf = null;
             formJSON.qty_product = orderSummary.totalQty;
             formJSON.products = product;
             console.log(formJSON);
