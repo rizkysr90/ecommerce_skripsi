@@ -16,7 +16,6 @@ export default function ShippingAddress() {
                 setIsLoading(true);
                 const res = await axios.get(`${process.env.REACT_APP_API_HOST}/customers/address`)
                 setAddress(res.data.data);
-                console.log(res.data.data);
                 setIsLoading(false);
             } catch (error) {
                 setIsLoading(false);
@@ -42,7 +41,6 @@ export default function ShippingAddress() {
                 {
                     address ? address.map((address => {
                         return (
-                            <>
                             <div className='text-sm' key={address.id}>
                                 <div className='flex justify-between'>
                                     {/* 1 */}
@@ -64,9 +62,8 @@ export default function ShippingAddress() {
                                     </div>
                                 
                                 </div>
+                                <div className="divider"></div>
                             </div>
-                            <div className="divider"></div>
-                            </>
                         )
                     }))
                     

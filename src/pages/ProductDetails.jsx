@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import BreadCrumb from '../components/BreadCrumb'
 import LoadSpinner from '../components/LoadSpinner';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function ProductDetails() {
     const {categoryName, productId} = useParams();
@@ -15,6 +16,18 @@ export default function ProductDetails() {
     const [isLoading, setIsLoading] = useState(false);
     const [trackQty, setTrackQty] = useState(1);
     const navigate = useNavigate();
+    const addToCart = async () => {
+        try {
+            const payload = {
+                ProductId : product?.id,
+                qty : trackQty
+            }
+            await axios.post(`${process.env.REACT_APP_API_HOST}/carts/update`, payload);
+            toast.success(`Berhasil menambahkan produk ke keranjang`);
+        } catch (error) {
+            
+        }
+    }
     useEffect(() => {
         const getData = async () => {
             try {
@@ -30,6 +43,18 @@ export default function ProductDetails() {
     }, [productId])
     return (
     <>
+        <ToastContainer
+            position="top-right"
+            autoClose={1500}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+        />
         <LoadSpinner isLoading={isLoading} />
         <div className='mt-8'>
             <div className='mx-24 '>
@@ -120,7 +145,10 @@ export default function ProductDetails() {
                             <div className='opacity-70'>Subtotal</div>
                             <div className='font-bold'>Rp{new Intl.NumberFormat(['ban', 'id']).format(product?.sell_price * trackQty)}</div>
                         </div>
-                        <div className='btn btn-secondary normal-case mt-4 text-base-100'>Tambah Ke Keranjang</div>
+                        <div className='btn btn-secondary normal-case mt-4 text-base-100'
+                            onClick={addToCart}
+                        >Tambah Ke Keranjang
+                        </div>
                         <div className='btn btn-secondary btn-outline text-black normal-case mt-2'
                             onClick={() => {
                                 navigate("/shopping-cart/direct-checkout", {

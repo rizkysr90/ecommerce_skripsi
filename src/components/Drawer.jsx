@@ -2,16 +2,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faBars, faUser} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import { useDispatch, useSelector } from "react-redux";
-
 import { Link } from 'react-router-dom';
 import { logoutUser } from '../features/authSlice';
 import { useNavigate } from 'react-router-dom';
+
 
 export const Drawer = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const navigate = useNavigate();
-
     const handleLogout = () => {
         dispatch(logoutUser());
         navigate('/')

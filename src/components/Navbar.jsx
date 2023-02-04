@@ -4,11 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from './../features/authSlice.js'
+import useSWR  from 'swr';
+import axios from 'axios';
 
 export const Navbar = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
-
+    const fetchCart = async (url) => await axios.get(url).then((res) => res.data.data);
+    const {data : cart} = useSWR(`${process.env.REACT_APP_API_HOST}/carts/count`, fetchCart);
     const handleLogout = () => {
         dispatch(logoutUser());
     }
@@ -34,7 +37,7 @@ export const Navbar = () => {
                 {user ? 
                 <div>
                     <div className="indicator" >
-                        <span className="indicator-item badge-sm badge badge-warning text-warning-content">99</span> 
+                        <span className="indicator-item badge-sm badge badge-warning text-warning-content">{cart?.totalProductInCart}</span> 
                         <Link to = "/" className=' text-primary-content'><FontAwesomeIcon icon={faCartShopping} size="xl" /></Link>
                     </div>
                     <div className="dropdown ml-4 dropdown-end">
