@@ -9,18 +9,14 @@ module.exports = {
     daisyui: {
       themes: [
         {
-          mytheme: {
-            primary: "#2F56AA",
-            secondary: "#27ae60",
-            accent: "#E570A1",
-            neutral: "#1D1820",
-            "base-100": "#FCFCFD",
-            "base-200" : "#F4F4F4",
-            "base-300" : "#141414",
-            "error" : "#F87272"
-            
-          }
-        }
-      ]
+          bumbleebee: {
+            ...require("daisyui/src/colors/themes")["[data-theme=bumblebee]"],
+            primary: "#f1c642",
+            secondary: "#0079c2",
+            "secondary-content" : "#ffffff",
+            "base-200" : "#f5f5f5"
+          },
+        },
+      ],
     }
   }

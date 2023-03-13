@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const loginUser = createAsyncThunk("users/loginUser", async (user, thunkAPI) => {
     try {
-        const response = await axios.post('http://localhost:8080/auth/login/customers', {
+        const response = await axios.post(`${process.env.REACT_APP_API_HOST}/auth/login/customers`, {
             email: user.email,
             password: user.password
         });
@@ -11,6 +11,7 @@ export const loginUser = createAsyncThunk("users/loginUser", async (user, thunkA
     } catch (error) {
         if(error.response){
             const message = error.response.data.metadata.msg;
+            console.log(message);
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -35,6 +36,13 @@ export const authSlice = createSlice({
             state.isSuccess = false;
             state.isLoading = false;
             state.message = false;
+        },
+        forceLogout : (state) => {
+            state.isError = false;
+            state.isSuccess = false;
+            state.isLoading = false;
+            state.message = '';
+            state.user = null;
         }
     },
     extraReducers : (builder) => {
@@ -68,5 +76,5 @@ export const authSlice = createSlice({
 })
 
 
-export const {reset} = authSlice.actions;
+export const {reset, forceLogout} = authSlice.actions;
 export default authSlice.reducer;

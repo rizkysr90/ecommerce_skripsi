@@ -1,79 +1,78 @@
+import { faEye, faEyeLowVision } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { reset } from '../features/authSlice'; 
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { toast, ToastContainer } from 'react-toastify';
-import imageContent from '../media/undraw_shopping_app_flsj.svg';
+import notFound from '../media/undraw_page_not_found_re_e9o6.svg';
 import override from '../styles/spinner';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeLowVision } from '@fortawesome/free-solid-svg-icons';
 
-export default function Register() {
+function ResetPassword() {
+    const [isLoading, setIsLoading] = useState('');
+    const [showPass1, setShowPass1] = useState(false);
+    const [showPass2, setShowPass2] = useState(false);
     const [currentPw, setCurrentPw] = useState('');
     const [comparePw, setComparePw] = useState('');
     const [statusPw, setStatusPw] = useState(false);
-    const [showPass1, setShowPass1] = useState(false);
-    const [showPass2, setShowPass2] = useState(false);
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { user, isSuccess } = useSelector(
-        (state) => state.auth
-      ); 
-    const [isLoading, setIsLoading] = useState(false);
-    const handleFormSubmit = async (e) => {
+    const [isError, setIsError] = useState(false);
+    const {token, userId} = useParams();
+    const handleSubmit = async () => {
         setIsLoading(true);
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const formJSON = Object.fromEntries(formData.entries());
-
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_HOST}/auth/register/customers`, formJSON)
-            .then((res) => res.data);
-            setIsLoading(false);
-            let user = res?.data;
-            user.password = currentPw;
-            navigate("/auth/validation/register", {
-                state : {
-                    user
-                }
+            await axios.post(`${process.env.REACT_APP_API_HOST}/auth/forgot-password/${userId}/${token}`, {
+                password : currentPw,
+                confirm_password : comparePw
             })
-            // dispatch(loginUser({email:formJSON.email, password: formJSON.password}));
+            setIsError(false)
+            setIsLoading(false);
+            toast.success('berhasil memperbarui password')
         } catch (error) {
             setIsLoading(false);
+            setIsError(true)
             let errMsg = 'Internal Server Error'
             if (error.response?.status !== 500) {
                 errMsg = error.response?.data?.metadata?.msg
+            }
+            if (error.response?.data?.metadata?.msg === 'invalid signature') {
+                errMsg = error.response?.data?.metadata?.msg
+                error.response.status = 401
             }
             
             toast.error(`Error ${error?.response?.status} - ${errMsg}`);
         }
     }
     useEffect(() => {
-        if (user || isSuccess) {
-            navigate("/");
+        const getData = async () => {
+            setIsLoading(true)
+            try {
+                await axios.get(`${process.env.REACT_APP_API_HOST}/auth/forgot-password/${userId}/${token}`)
+                .then(res => res.data);
+                setIsError(false);
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+                setIsError(true);
+            }
         }
-        dispatch(reset());
-    }, [user, isSuccess, dispatch, navigate]);
-  return (
-    <>
-        {
-          isLoading && 
-          <div className='bg-base-100 fixed z-50 w-full left-0 top-0 right-0 min-h-screen'>
-                <ClipLoader
-                color={"#1eb854"}
-                loading={isLoading}
-                size={35}
-                cssOverride={override}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-                />
-          </div>
-        }
-        <div className="min-h-screen flex bg-base-200 justify-center items-center">
+        getData()
+    }, [token, userId])
+
+    return (
+        <>
+            {
+              isLoading && 
+              <div className='bg-base-100 fixed z-50 w-full left-0 top-0 right-0 min-h-screen'>
+                    <ClipLoader
+                    color={"#1eb854"}
+                    loading={isLoading}
+                    size={35}
+                    cssOverride={override}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                    />
+              </div>
+            }
             <ToastContainer
             autoClose={3000}
             limit={1}
@@ -86,30 +85,25 @@ export default function Register() {
             pauseOnHover
             theme="dark"
             />
-            <div className="flex flex-col lg:flex-row items-center  w-full justify-center">
-                <div className="text-center mr-14 hidden lg:flex flex-col items-center justify-center ">
-                    <div className=''>
-                        <img src={imageContent} 
-                        className="w-96"
-                        alt="banner logo pendaftaran"/>
-                    </div>
-                    <p className="font-bold text-lg mt-8">Belanja lebih mudah, hanya di Store Name</p>
-                </div>
-                <form className=" basis-6/12 shadow-lg w-full max-w-sm shadow-lg rounded-lg bg-base-100"
-                    onSubmit={handleFormSubmit}
-                >
-                    <div className="flex flex-col px-10 py-4">
-                        <div className='font-bold text-2xl text-center'>Daftar Sekarang</div>
-                        <div className='text-center text-sm'>Sudah punya akun? <Link to = "/auth/login" 
-                        
-                        className='text-primary underline'>Masuk</Link></div>
-                        <div className="form-control">
-                            <label className="label" htmlFor='email'>
-                                <span className="label-text">Email</span>
-                            </label>
-                            <input required type="text" placeholder="email@gmail.com" id="email" name="email" className="input input-bordered" />
+            <div className='min-h-screen flex items-center bg-base-200 justify-center'>
+                {
+                    isError ? 
+                    <div className='flex flex-col'>
+                        <div className='w-72'>
+                            <img src={notFound} alt="back"/>
                         </div>
-                        <div className="form-control">
+                        <div className='mt-2'>Oops not allowed, please back to home</div>
+                        <Link to='/' className='btn normal-case mt-2 btn-primary'>Back to home</Link>
+                    </div>
+                    :
+                    <div className='shadow-lg flex flex-col px-10 py-8 bg-base-100 rounded-lg'>
+                        <div className='text-lg font-bold text-center'>Reset Password</div>
+                        {/* <div className='flex justify-center mt-2'>
+                            <img src={forgotPassImg} 
+                            className="h-24"
+                            alt='forgot password'/>
+                        </div> */}
+                    <div className="form-control">
                             <label className="label" htmlFor='password'>
                                 <span className="label-text">Password</span>
                             </label>
@@ -179,15 +173,18 @@ export default function Register() {
                         <div className="form-control mt-4">
                             {
                                 currentPw && comparePw && statusPw ? 
-                                <button type="submit" className="btn btn-secondary normal-case font-bold">Daftar</button>
+                                <button type="submit" className="btn btn-secondary normal-case font-bold"
+                                    onClick={handleSubmit}
+                                >Reset</button>
                                 :
-                                <button type="submit" className="btn btn-disabled normal-case font-bold">Daftar</button>
+                                <button type="submit" className="btn btn-disabled normal-case font-bold">Reset</button>
                             }
                         </div>
                     </div>
-                </form>
+                }
             </div>
-        </div>
-    </>
-  )
+        </>
+      )
 }
+
+export default ResetPassword

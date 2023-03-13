@@ -10,7 +10,8 @@ export default function LandingPage() {
             try {
                 setIsLoading(true)
                 const res = await axios.get(`${process.env.REACT_APP_API_HOST}/products`);
-                setProducts(res.data.data);
+                setProducts(res.data.data.products);
+                // console.log(res.data.data);
                 setIsLoading(false);
             } catch (error) {
                 setIsLoading(false);
@@ -23,7 +24,7 @@ export default function LandingPage() {
         <LoadSpinner isLoading = {isLoading}/>
         <div>
             <div className='mx-14'>
-                <div className='flex bg-primary'>
+                <div className='flex bg-base-100'>
                     {
                         products ? products.map((data) => {
                             return (

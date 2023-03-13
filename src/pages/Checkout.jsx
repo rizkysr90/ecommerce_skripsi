@@ -1,34 +1,26 @@
-import { faClose,faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
-import React from 'react'
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import ShipAddress from '../components/ShipAddress';
-import {getDistanceFromLatLonInKm} from '../utility/haversine';
+import React, { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom';
 import rupiahFormat from '../utility/rupiahFormat';
+import useSWR from 'swr'
+import axios from 'axios';
+import ModalSelectAddress from '../components/ModalSelectAddress';
+import ShipAddress from './../components/ShipAddress';
+import {getDistanceFromLatLonInKm} from './../utility/haversine';
 
-function DirectCheckout() {
-    const storeGeoLoc = {
-        lat : -6.235508991967569,
-        lng: 107.0679693511163
-    }
-    // const storeGeoLoc = {
-    //     lat : -6.261193490706907,
-    //     lng: 106.90998506237997
-    // }
+export default function Checkout() {
+    const location = useLocation();
+    const getCustAddress = async (url) => await axios.get(url).then((res) => res.data.data);
+    const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress)
+    const [products, setProducts] = useState(location.state?.products);
+    const [selectedAddress, setSelectedAddress] = useState('');
     const orderSummary = {
         totalQty : 0,
         totalPrice : 0
     };
-    const location = useLocation();
-    const productInCart =  location.state?.products;
-    const [product,setProduct] = useState(location.state?.products);
-    const [address, setAddress] = useState([]);
-    const { user } = useSelector((state) => state.auth);
-    const [selectedAddress, setSelectedAddress] = useState("");
+    const storeGeoLoc = {
+        lat : -6.235508991967569,
+        lng: 107.0679693511163
+    }
     const handleSubmitOrder = async (e) => {
         try {
             e.preventDefault();
@@ -38,31 +30,24 @@ function DirectCheckout() {
 
             formJSON.amount = orderSummary.totalPrice;
             formJSON.qty_product = orderSummary.totalQty;
-            formJSON.products = product;
+            formJSON.products = products;
+            console.log(formJSON)
             const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON);
             
         } catch (error) {
             
         }
     }
-    useEffect(() => {
-        const getData = async () => {
-            const res = await axios.get(`${process.env.REACT_APP_API_HOST}/customers/address`);
-            setAddress(res.data.data);
-        }
-        getData();
-    }, [productInCart])
     return (
         <>
-            {
-                location.state?.products ?  
+            
+            {location.state?.products &&  
                 <div className='my-10'>
                     <div className='mx-24 mt-8'>
-                        <div className='font-bold text-lg mb-4'>Direct Checkout</div>
-                       
-                        <form
-                         onSubmit={handleSubmitOrder}
-                         className='flex'>
+                        <div className='font-bold text-lg mb-4'>Checkout</div>
+                        <form className="flex"
+                            onSubmit={handleSubmitOrder}
+                        >
                             <div className='basis-8/12'>
                                 <div className="alert shadow">
                                     <div>
@@ -72,10 +57,10 @@ function DirectCheckout() {
                                 </div>
                                 <div className="divider"></div>
                                 <div className='mb-8 font-bold text-lg'>Barang yang dibeli</div>
-                                {
-                                    product?.map((data) => {
-                                        orderSummary.totalQty += data?.qty;
-                                        orderSummary.totalPrice += (data?.price * data?.qty)
+                            {
+                                    products?.map((data) => {
+                                        orderSummary.totalQty += data?.Cart_detail?.qty;
+                                        orderSummary.totalPrice += (data?.sell_price * data?.Cart_detail?.qty)
                                         return (
                                             <div className="card card-side bg-base-100 h-32 shadow rounded-none" key={data?.id}>
                                                 <figure className='w-32 bg-primary h-32 rounded-none'>
@@ -83,10 +68,9 @@ function DirectCheckout() {
                                                 </figure>
                                                 <div className="card-body p-2">
                                                     <h2 className="card-title text-sm">{data?.name}</h2>
-                                                    <p className='font-bold text-xs opacity-70'>Harga satuan : Rp{rupiahFormat(data?.price)}</p>
-                                                    <p className='font-bold text-xs -mt-3 opacity-70'>Jumlah Pembelian : {data?.qty}</p>
-                                                    <p className='font-bold text-lg'>Rp{new Intl.NumberFormat(['ban', 'id']).format(data?.price * data?.qty)}</p>
-                                                   
+                                                    <p className='font-bold text-xs opacity-70'>Harga satuan : {data?.sell_price}</p>
+                                                    <p className='font-bold text-xs -mt-3 opacity-70'>Jumlah Pembelian : {data?.Cart_detail?.qty}</p>
+                                                    <p className='font-bold text-lg'>Rp{rupiahFormat(data?.sell_price * data?.Cart_detail?.qty)}</p>
                                                 </div>
                                             </div>
                                         )
@@ -97,47 +81,34 @@ function DirectCheckout() {
                                     
                                 ></textarea>
                                 <div className="divider"></div>
-                                <div>
+                                <div className=''>
                                     <div className='mb-4 font-bold text-lg'>Pengiriman</div>
-                                   
-                                    {
-                                        address.length < 1  ? 
-                                        <div className='btn btn-primary'>Tambah Alamat Pengiriman</div> 
-                                        : 
-                                        // {/* The button to open modal */}
-                                        <>
-                                            <label htmlFor="my-modal-6" 
-                                            className="btn  btn-outline w-full btn-primary normal-case">
-                                                <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2"/>
-                                                Pilih Alamat Pengiriman
-                                            </label>
-                                            <input type="checkbox" id="my-modal-6" className="modal-toggle" />
-                                            <div className="modal modal-bottom sm:modal-middle">
-                                            <div className="modal-box">
-                                                <div className='flex justify-end'>
-                                                    <label htmlFor="my-modal-6" className="btn btn-ghost px-4 py-2 text-lg">
-                                                        <FontAwesomeIcon icon={faClose}></FontAwesomeIcon>
-                                                    </label>
-                                                </div>
-                                                <h3 className="font-bold text-lg text-center">Pilih Alamat Pengiriman</h3>
-                                               
-                                                {
-                                                    address.map((data) => {
-                                                        return (
-                                                            <ShipAddress 
-                                                            key={data.id}
-                                                            address={data}
-                                                            onSelected={setSelectedAddress}
-                                                            />
-                                                        )
-                                                    })
-                                                }
-                                            </div>
+                                    <div className="alert p-2 mb-3">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <span>Pemesanan dengan delivery order wajib mengatur alamat pengiriman</span>
                                         </div>
-                                        </>
-
+                                    </div>
+                                    {
+                                        address?.length < 1 && 
+                                        <div className='flex flex-col items-center'>
+                                            <div>Belum ada alamat pengiriman</div>
+                                            <Link to="/customers/address/new" 
+                                            className='text-sm underline'>
+                                                Tambah alamat pengiriman disini!
+                                            </Link>
+                                        </div> 
                                     }
-                                    <div className='flex justify-between'>
+                                    {
+                                        address?.length &&
+                                        <>
+                                           <ModalSelectAddress
+                                                address = {address}
+                                                onSelected={setSelectedAddress}
+                                           />
+                                        </>
+                                    }
+                                      <div className='flex justify-between'>
                                         <div className='basis-2/5'>
                                             <div className='mt-4 font-bold text-sm'>Alamat Toko</div>
                                             <div className="divider"></div>
@@ -209,14 +180,14 @@ function DirectCheckout() {
                                                 Total Harga : ({`${orderSummary?.totalQty} Barang`})
                                             </span>
                                             <span>
-                                                Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}
+                                                Rp{rupiahFormat(orderSummary?.totalPrice)}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="divider"></div>
                                     <div className='font-bold flex justify-between'>
                                         Total Tagihan
-                                        <span>Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}</span>
+                                        <span>Rp{rupiahFormat(orderSummary?.totalPrice)}</span>
                                     </div>
                                     <button 
                                     type='submit'
@@ -227,11 +198,9 @@ function DirectCheckout() {
                             </div>
                         </form>
                     </div>
-
-                </div> : <div>Halaman Tidak Ditemukan</div>
+                </div>
             }
-        </>
+            
+         </>   
     )
 }
-
-export default DirectCheckout

@@ -22,7 +22,7 @@ export default function ProductDetails() {
                 ProductId : product?.id,
                 qty : trackQty
             }
-            await axios.post(`${process.env.REACT_APP_API_HOST}/carts/update`, payload);
+            await axios.post(`${process.env.REACT_APP_API_HOST}/carts/add`, payload);
             toast.success(`Berhasil menambahkan produk ke keranjang`);
         } catch (error) {
             
