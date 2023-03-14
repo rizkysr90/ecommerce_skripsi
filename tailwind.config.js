@@ -14,7 +14,9 @@ module.exports = {
             primary: "#f1c642",
             secondary: "#0079c2",
             "secondary-content" : "#ffffff",
-            "base-200" : "#f5f5f5"
+            "base-200" : "#f5f5f5",
+            "success" : "#1eb854",
+            "success-content" : "#c2ffd7"
           },
         },
       ],

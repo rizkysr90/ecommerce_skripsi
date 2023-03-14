@@ -1,7 +1,7 @@
 import React, {} from 'react'
 import { Link, Outlet } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowCircleDown, faArrowDown, faArrowRight, faBoxesStacked, faCaretDown, faCartShopping, faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faArrowCircleDown, faArrowDown, faArrowRight, faBars, faBoxesStacked, faCaretDown, faCartShopping, faHamburger, faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from './../features/authSlice.js'
 import useSWR  from 'swr';
@@ -13,34 +13,26 @@ export const Navbar = () => {
     const { user } = useSelector((state) => state.auth);
     const fetchCategories = async (url) => await axios.get(url).then((res) => res.data.data);
     const {data : categories} = useSWR(`${process.env.REACT_APP_API_HOST}/productCategories`, fetchCategories);
-    console.log(categories);
     const handleLogout = () => {
         dispatch(logoutUser());
     }
     
   return (
     <>
-        <div className="navbar bg-primary py-2 px-1 shadow-lg lg:px-20 ">
-            <div className="navbar-start">
-                <div className="dropdown block lg:hidden">
-                    <label tabIndex={0} className="btn btn-ghost btn-circle text-primary-content">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                    </label>
-                    <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-72">
-                        <li><Link to = "/">Homepage</Link></li>
-                        <li><Link to = "/">Portfolio</Link></li>
-                        <li><Link to = "/">About</Link></li>
-                    </ul>
-                </div>
-                <Link to = "/" className="btn btn-secondary normal-case ">Store Name</Link>
-                <div className='ml-4 dropdown '>
-                    <div className='btn btn-ghost normal-case flex items-center'
+        <div className="navbar bg-primary fixed top-0 z-50 py-2 px-1 shadow-lg lg:px-20 ">
+            <div className="navbar-start w-auto md:w-1/2">
+                <Link to = "/" className="btn hidden md:flex btn-secondary normal-case ">Store Name</Link>
+                <div className='ml-0  md:ml-4 dropdown p-0'>
+                    <div className='btn btn-ghost 
+                    normal-case flex flex-row items-center justify-center
+                    '
                         tabIndex={0}
                     >
                         <FontAwesomeIcon 
-                        icon={faBoxesStacked} className=""/>
-                        <span className='ml-1'>Kategori</span>
-                        <FontAwesomeIcon icon={faCaretDown} className="ml-2"/>
+                        icon={faBoxesStacked} className="hidden md:block"/>
+                        <FontAwesomeIcon icon={faBars} className="block md:hidden h-6"/>
+                        <span className='ml-1 hidden md:block'>Kategori</span>
+                        <FontAwesomeIcon icon={faCaretDown} className="ml-2 hidden md:block"/>
                     </div>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
                         {
@@ -60,7 +52,7 @@ export const Navbar = () => {
                 </div>
              
             </div>
-            <div className="navbar-center w-5/12">
+            <div className="navbar-center grow md:w-5/12">
                 <div className='  w-full'>
                     <input 
                     placeholder='Cari produk'
@@ -71,12 +63,12 @@ export const Navbar = () => {
                 className='-ml-7 cursor-pointer hover:text-secondary'
                 icon={faSearch}/>
             </div>
-            <div className="navbar-end ">
+            <div className="navbar-end  w-auto md:w-1/2">
                 
                 {user ? 
-                <div>
+                <div className='flex items-center'>
                     <Cart/>
-                    <div className="dropdown ml-4 dropdown-end">
+                    <div className="dropdown hidden md:flex dropdown-end">
                         <label tabIndex={0} 
                             className="btn btn-ghost mr-2 normal-case text-primary-content px-4 flex flex-col">
                                 <FontAwesomeIcon icon={faUser} size='xl'/>
@@ -93,19 +85,21 @@ export const Navbar = () => {
                     </div> 
                  </div>   
                 :
-                <div>
-                    <Link to = "/auth/login" className='btn btn-secondary btn-outline bg-secondary-content btn-sm normal-case ml-8'>Masuk</Link>
-
-                    <Link to = "/auth/register" className='btn btn-secondary btn-sm normal-case ml-3'>Daftar</Link>
+                <div className='flex '>
+                    <Link to = "/auth/login" className='btn hidden md:flex btn-secondary btn-outline bg-secondary-content btn-sm normal-case ml-8'>Masuk</Link>
+                    <Link to = "/auth/login" className='btn flex md:hidden btn-secondary mr-4 btn-sm rounded-lg normal-case ml-8'>Masuk</Link>
+                    <Link to = "/auth/register" className='btn hidden md:flex btn-secondary btn-sm normal-case ml-3'>Daftar</Link>
                     
                 </div>
                 }
             </div>
         </div>
-        <div className='pb-20 lg:pb-0 relative bg-base-200 min-h-screen'>
-            <Outlet/>
+        <div className='pb-20 lg:pb-0 relative bg-base-200 bg-secondary min-h-screen'>
+            <Outlet
+                context={{categories}}
+            />
         </div>
-        <div className="btm-nav bg-neutral lg:hidden">
+        <div className="btm-nav fixed inset-x-0 bottom-0 z-50 bg-neutral lg:hidden">
             <button className="text-neutral-content">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             </button>
@@ -114,8 +108,9 @@ export const Navbar = () => {
             </button>
             <button className="text-neutral-content">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            </button>
+        </button>
         </div>
+      
         </>
   )
 }

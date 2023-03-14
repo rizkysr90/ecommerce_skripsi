@@ -39,7 +39,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard/>} />
             <Route path="/cart" element={<MyCart/>} />
             <Route path="/cart/checkout" element={<Checkout/>}/>
-            <Route path="/products/:categoryName/:productId" element={<ProductDetails/>}/>
+            <Route path="/products/:productId" element={<ProductDetails/>}/>
             <Route path="/shopping-cart/direct-checkout" element={<DirectCheckout/>} />
           </Route>
         </Routes>

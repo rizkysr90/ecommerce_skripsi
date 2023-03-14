@@ -11,7 +11,7 @@ import LoadSpinner from '../components/LoadSpinner';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function ProductDetails() {
-    const {categoryName, productId} = useParams();
+    const {productId} = useParams();
     const [product, setProduct] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [trackQty, setTrackQty] = useState(1);
@@ -59,7 +59,6 @@ export default function ProductDetails() {
         <div className='mt-8'>
             <div className='mx-24 '>
                 <BreadCrumb
-                    category={categoryName}
                     name={product?.name}
                 />
                 <div className='flex mt-8'>
