@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
-import { forceLogout } from '../features/authSlice';
+import { logoutUser } from '../features/authSlice';
 import { useDispatch } from 'react-redux';
 function Cart() {
     const dispatch = useDispatch();
@@ -12,7 +12,7 @@ function Cart() {
     const {data : cart, error} = useSWR(`${process.env.REACT_APP_API_HOST}/carts/count`, fetchCart);
     useEffect(() => {
         if (error) {
-            dispatch(forceLogout());
+            dispatch(logoutUser());
         }
     }, [error])
     return (

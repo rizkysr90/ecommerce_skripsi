@@ -1,7 +1,7 @@
-import React, {} from 'react'
-import { Link, Outlet } from 'react-router-dom';
+import React, { useState } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowCircleDown, faArrowDown, faArrowRight, faBars, faBoxesStacked, faCaretDown, faCartShopping, faHamburger, faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
+import {  faArrowRight, faBars, faBoxesStacked, faCaretDown,  faSearch, faShoppingBag, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from './../features/authSlice.js'
 import useSWR  from 'swr';
@@ -9,6 +9,8 @@ import axios from 'axios';
 import Cart from './Cart.jsx';
 
 export const Navbar = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const fetchCategories = async (url) => await axios.get(url).then((res) => res.data.data);
@@ -16,10 +18,18 @@ export const Navbar = () => {
     const handleLogout = () => {
         dispatch(logoutUser());
     }
-    
+    const [search, setSearch] = useState('');
+    const handleSearch = (e) => {
+        e.preventDefault();
+        navigate({
+            pathname : `/search`,
+            search: `?keyword=${search}`
+        })
+        setSearch('');
+    }
   return (
     <>
-        <div className="navbar bg-primary fixed top-0 z-50 py-2 px-1 shadow-lg lg:px-20 ">
+        <div className="navbar bg-primary fixed top-0 z-50 py-2 px-1  lg:px-20 ">
             <div className="navbar-start w-auto md:w-1/2">
                 <Link to = "/" className="btn hidden md:flex btn-secondary normal-case ">Store Name</Link>
                 <div className='ml-0  md:ml-4 dropdown p-0'>
@@ -39,6 +49,7 @@ export const Navbar = () => {
                             categories?.map((data) => {
                                 return (
                                     <Link 
+                                    to={`/category/${data.name}/${data.id}`} 
                                     className=' rounded-lg p-2 btn-ghost normal-case flex justify-between items-center '
                                     key={data?.id}>
                                         {data?.name}
@@ -53,15 +64,23 @@ export const Navbar = () => {
              
             </div>
             <div className="navbar-center grow md:w-5/12">
-                <div className='  w-full'>
+                <form className='w-full'
+                    onSubmit={(e) => handleSearch(e)}
+                >
                     <input 
+                    value={search}
                     placeholder='Cari produk'
                     className='input input-sm w-full rounded-lg'
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                    }}
                     type="text"/>
-                </div>
-                <FontAwesomeIcon 
-                className='-ml-7 cursor-pointer hover:text-secondary'
-                icon={faSearch}/>
+                    <button type='submit'>
+                        <FontAwesomeIcon 
+                        className='-ml-7 cursor-pointer hover:text-secondary'
+                        icon={faSearch}/>
+                    </button>
+                </form>
             </div>
             <div className="navbar-end  w-auto md:w-1/2">
                 
@@ -96,20 +115,26 @@ export const Navbar = () => {
         </div>
         <div className='pb-20 lg:pb-0 relative bg-base-200 bg-secondary min-h-screen'>
             <Outlet
-                context={{categories}}
+                context={{categories, search}}
             />
         </div>
-        <div className="btm-nav fixed inset-x-0 bottom-0 z-50 bg-neutral lg:hidden">
-            <button className="text-neutral-content">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-            </button>
-            <button className="text-neutral-content active">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </button>
-            <button className="text-neutral-content">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-        </button>
-        </div>
+        {/* {
+            (location.pathname === '/' || location.pathname === '/customers/setting') &&
+        } */}
+            <div className="btm-nav border border-base-200 fixed inset-x-0 bottom-0 z-50 bg-base-100 lg:hidden">
+                <NavLink className="hover:bg-base-200" to={'/'}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                    <div className='text-sm'>Beranda</div>
+                </NavLink>
+                <NavLink className="hover:bg-base-200" to="/tes">
+                    <FontAwesomeIcon icon={faShoppingBag} className=""/>
+                    <div className='text-sm'>My Order</div>
+                </NavLink>
+                <NavLink to="/customers/setting" className="hover:bg-base-200">
+                    <FontAwesomeIcon icon={faUser}/>
+                    <div className='text-sm'>Akun</div>
+            </NavLink>
+            </div>
       
         </>
   )

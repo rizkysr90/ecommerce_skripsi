@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Drawer } from './components/Drawer';
-import { Home } from './components/Home';
 import { Login } from './pages/Login';
 import { AdminDashboard } from './pages/AdminDashboard';
 import Register from './pages/Register';
@@ -19,6 +17,10 @@ import Checkout from './pages/Checkout';
 import RegisterValidation from './pages/RegisterValidation';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import UserSettingsMob from './pages/UserSettingsMob';
+import SearchResult from './pages/SearchResult';
+import GroupByCategory from './pages/GroupByCategory';
+import AllProducts from './pages/AllProducts';
 
 function App() {
   return (
@@ -29,18 +31,22 @@ function App() {
           <Route path="/auth/validation/register" element={<RegisterValidation/>}/>
           <Route path="/auth/forgot-password" element={<ForgotPassword/>} />
           <Route path="/forgot-password/:userId/:token" element={<ResetPassword/>} />
-          <Route path="/" element={<Navbar />} >
+          <Route path="/" element={<Navbar />} home={true}>
             <Route path='/' element={<LandingPage/>}/>
             <Route path="/oke" elemetn={<div>Oke nice progress</div>} />
+            <Route path="/search" element={<SearchResult/>}/>
+            <Route path="/customers/setting" element={<UserSettingsMob/>}/>
             <Route path="/customers/address" element={<ShippingAddress/>} />
             <Route path="/customers/address/new" element={<ShippingAddressNew/>} />
             <Route path="/customers/myorders" element={<MyOrders/>} />
             <Route path="/customers/myorders/:id" element={<MyOrderDetail/>} />
             <Route path="/admin/dashboard" element={<AdminDashboard/>} />
             <Route path="/cart" element={<MyCart/>} />
+            <Route path="/category/:categoryName/:categoryId" element={<GroupByCategory/>}/>
             <Route path="/cart/checkout" element={<Checkout/>}/>
             <Route path="/products/:productId" element={<ProductDetails/>}/>
             <Route path="/shopping-cart/direct-checkout" element={<DirectCheckout/>} />
+            <Route path="/products" element={<AllProducts/>} />
           </Route>
         </Routes>
       </BrowserRouter>

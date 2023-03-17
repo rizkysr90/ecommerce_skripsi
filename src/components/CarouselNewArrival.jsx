@@ -27,7 +27,7 @@ function CarouselNewArrival({newProducts}) {
                     return (
                     <SwiperSlide className='' key={data.id}>
                             <Link to={`/products/${data?.id}`}
-                                className="card card-compact basis-[14%] grow mx-2 mb-4 bg-base-100  rounded drop-shadow-lg" 
+                                className="card card-compact basis-[14%] grow mx-2 mb-4 bg-base-100  rounded " 
                                 key={data.id}>
                                 <figure>
                                     <img src={data?.url_img} alt="Shoes"
@@ -71,7 +71,7 @@ function CarouselNewArrival({newProducts}) {
                     return (
                     <SwiperSlide className='' key={data.id}>
                             <Link to={`/products/${data?.id}`}
-                                className="card card-compact basis-[14%] grow mx-2 mb-4 bg-base-100  rounded drop-shadow-lg" 
+                                className="card card-compact basis-[14%] grow mx-2 mb-4 bg-base-100  rounded" 
                                 key={data.id}>
                                 <figure>
                                     <img src={data?.url_img} alt="Shoes"

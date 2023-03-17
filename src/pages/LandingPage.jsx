@@ -38,11 +38,7 @@ export default function LandingPage() {
     }, [])
   return (
     <>
-        <LoadSpinner isLoading = {isLoading}/>
         <div className='mx-3 md:mx-14 pt-16'>
-            <div className="mt-4 bg-base-100">
-                        
-            </div>
             <div className='mt-4'>
                 <Swiper 
                     pagination={{ clickable: true }} 
@@ -78,7 +74,8 @@ export default function LandingPage() {
             <div className='mt-4 bg-base-100 p-4 rounded'>
                 <div className='flex justify-between items-center'>
                     <div className='ml-2 font-bold text-xl'>Semua Produk</div>
-                    <div className='btn btn-outline btn-secondary font-bold md:px-8 normal-case btn-sm rounded mr-2'>Lihat Semua</div>
+                    <Link to={'/products'} className='btn btn-outline btn-secondary font-bold md:px-8 normal-case btn-sm rounded mr-2'>
+                        Lihat Semua</Link>
                 </div>
                 <div className="divider my-1 mb-4"></div>
                 <div className='flex flex-wrap'>
@@ -86,7 +83,7 @@ export default function LandingPage() {
                     products ? products.map((data) => {
                         return (
                             <Link to={`/products/${data?.id}`}
-                                className="card card-compact basis-5/12 lg:basis-[14%]  grow mx-2 mb-4 bg-base-100  rounded drop-shadow-lg" 
+                                className="card card-compact basis-5/12 lg:basis-[14%]  grow mx-2 mb-4 bg-base-100  rounded " 
                                 key={data.id}>
                                 <figure>
                                     <img src={data?.url_img} alt="Shoes"

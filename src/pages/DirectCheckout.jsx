@@ -1,31 +1,29 @@
-import { faClose,faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { faClose,faMapMarkerAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ShipAddress from '../components/ShipAddress';
 import {getDistanceFromLatLonInKm} from '../utility/haversine';
 import rupiahFormat from '../utility/rupiahFormat';
+import notFoundImg from '../media/undraw_page_not_found_re_e9o6.svg';
 
 function DirectCheckout() {
+    const navigate = useNavigate();
     const storeGeoLoc = {
         lat : -6.235508991967569,
         lng: 107.0679693511163
     }
-    // const storeGeoLoc = {
-    //     lat : -6.261193490706907,
-    //     lng: 106.90998506237997
-    // }
     const orderSummary = {
         totalQty : 0,
         totalPrice : 0
     };
     const location = useLocation();
     const productInCart =  location.state?.products;
-    const [product,setProduct] = useState(location.state?.products);
+    const [product] = useState(location.state?.products);
     const [address, setAddress] = useState([]);
     const { user } = useSelector((state) => state.auth);
     const [selectedAddress, setSelectedAddress] = useState("");
@@ -50,186 +48,177 @@ function DirectCheckout() {
             const res = await axios.get(`${process.env.REACT_APP_API_HOST}/customers/address`);
             setAddress(res.data.data);
         }
+        if (!user) {
+            navigate('/')
+        }
         getData();
     }, [productInCart])
     return (
         <>
-            {
-                location.state?.products ?  
-                <div className='my-10'>
-                    <div className='mx-24 mt-8'>
-                        <div className='font-bold text-lg mb-4'>Direct Checkout</div>
-                       
-                        <form
-                         onSubmit={handleSubmitOrder}
-                         className='flex'>
-                            <div className='basis-8/12'>
-                                <div className="alert shadow">
-                                    <div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span>Ini halaman terakhir dari proses belanjamu. Pastikan semua sudah benar, ya. :)</span>
+            <div className='pt-20 bg-base-200 mx-3 md:mx-20 '>
+                {
+                    product ?  
+                    <div className=''>
+                        <div className=''>
+                            <form
+                            onSubmit={handleSubmitOrder}
+                            className='flex flex-col md:flex-row'>
+                                <div className='basis-8/12'>
+                                    <div className="alert p-0">
+                                        <div className=''>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <span className='text-xs font-bold'>Ini halaman terakhir dari proses belanjamu. Pastikan semua sudah benar, ya. :)</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="divider"></div>
-                                <div className='mb-8 font-bold text-lg'>Barang yang dibeli</div>
-                                {
-                                    product?.map((data) => {
-                                        orderSummary.totalQty += data?.qty;
-                                        orderSummary.totalPrice += (data?.price * data?.qty)
-                                        return (
-                                            <div className="card card-side bg-base-100 h-32 shadow rounded-none" key={data?.id}>
-                                                <figure className='w-32 bg-primary h-32 rounded-none'>
-                                                    <img src={data?.url_img} alt="gambar produk yang dibeli"/>
-                                                </figure>
-                                                <div className="card-body p-2">
-                                                    <h2 className="card-title text-sm">{data?.name}</h2>
-                                                    <p className='font-bold text-xs opacity-70'>Harga satuan : Rp{rupiahFormat(data?.price)}</p>
-                                                    <p className='font-bold text-xs -mt-3 opacity-70'>Jumlah Pembelian : {data?.qty}</p>
-                                                    <p className='font-bold text-lg'>Rp{new Intl.NumberFormat(['ban', 'id']).format(data?.price * data?.qty)}</p>
-                                                   
+                                    <div className="divider mb-1"></div>
+                                    <div>
+                                        {
+                                            address.length < 1  ? 
+                                            <div className='border text-secondary border-dashed
+                                            cursor-pointer
+                                            border-primary py-4 flex justify-center items-center rounded'>
+                                                <div>
+                                                    <FontAwesomeIcon icon={faPlusCircle} className='mr-2'/>
+                                                    Tambah Alamat Pengiriman
                                                 </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                                <div className='my-4 text-sm'>Tulis Catatan Pesanan : (Tidak wajib)</div>
-                                <textarea className="textarea w-full textarea-bordered" placeholder="Bio" name='notes'
-                                    
-                                ></textarea>
-                                <div className="divider"></div>
-                                <div>
-                                    <div className='mb-4 font-bold text-lg'>Pengiriman</div>
-                                   
-                                    {
-                                        address.length < 1  ? 
-                                        <div className='btn btn-primary'>Tambah Alamat Pengiriman</div> 
-                                        : 
-                                        // {/* The button to open modal */}
-                                        <>
-                                            <label htmlFor="my-modal-6" 
-                                            className="btn  btn-outline w-full btn-primary normal-case">
-                                                <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2"/>
-                                                Pilih Alamat Pengiriman
-                                            </label>
-                                            <input type="checkbox" id="my-modal-6" className="modal-toggle" />
-                                            <div className="modal modal-bottom sm:modal-middle">
-                                            <div className="modal-box">
-                                                <div className='flex justify-end'>
-                                                    <label htmlFor="my-modal-6" className="btn btn-ghost px-4 py-2 text-lg">
-                                                        <FontAwesomeIcon icon={faClose}></FontAwesomeIcon>
-                                                    </label>
-                                                </div>
-                                                <h3 className="font-bold text-lg text-center">Pilih Alamat Pengiriman</h3>
-                                               
-                                                {
-                                                    address.map((data) => {
-                                                        return (
-                                                            <ShipAddress 
-                                                            key={data.id}
-                                                            address={data}
-                                                            onSelected={setSelectedAddress}
-                                                            />
-                                                        )
-                                                    })
-                                                }
-                                            </div>
-                                        </div>
-                                        </>
-
-                                    }
-                                    <div className='flex justify-between'>
-                                        <div className='basis-2/5'>
-                                            <div className='mt-4 font-bold text-sm'>Alamat Toko</div>
-                                            <div className="divider"></div>
-                                            <ShipAddress address={{
-                                                id : 999,
-                                                recipient_name : 'Rizki Plastik',
-                                                recipient_phone_number : '081283007959',
-                                                street : 'Jalan Puri Cendana RPC 112',
-                                                village : 'Sumberjaya',
-                                                district : 'Tambun Selatan',
-                                                state : 'KAB BEKASI',
-                                                province : 'JAWA BARAT',
-                                                postal_code : '17510'
-                                            }}
-                                                isNoAction={true}
-                                            />
-                                        </div>
-                                        <div className='basis-2/5'>
-                                            {
-                                                selectedAddress ? 
-                                                <>
-                                                    <div className='mt-4 font-bold text-sm'>
-                                                        Tujuan Pengiriman (
-                                                        <span>
-                                                        {getDistanceFromLatLonInKm(storeGeoLoc.lat, 
-                                                            storeGeoLoc.lng, 
-                                                            selectedAddress.lat,
-                                                            selectedAddress.lng).toFixed(1)
-                                                        }
-                                                        {' '}Km)
-                                                        </span>
+                                            </div> 
+                                            : 
+                                            // {/* The button to open modal */}
+                                            <>
+                                                <label htmlFor="my-modal-6" 
+                                                className="btn  btn-outline w-full btn-primary normal-case">
+                                                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2"/>
+                                                    Pilih Alamat Pengiriman
+                                                </label>
+                                                <input type="checkbox" id="my-modal-6" className="modal-toggle" />
+                                                <div className="modal modal-bottom sm:modal-middle">
+                                                <div className="modal-box">
+                                                    <div className='flex justify-end'>
+                                                        <label htmlFor="my-modal-6" className="btn btn-ghost px-4 py-2 text-lg">
+                                                            <FontAwesomeIcon icon={faClose}></FontAwesomeIcon>
+                                                        </label>
                                                     </div>
-                                                    <div className="divider"></div>
-                                                    <ShipAddress address={selectedAddress}
-                                                        isNoAction={true}
-                                                    />
-                                                </>
-                                                : null
-                                            }
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className='font-bold text-sm'>Jenis Pengiriman</div>
-                                        <select className="select select-bordered w-full max-w-xs mt-4"
-                                            name='shipping_method'
-                                        >
-                                            <option disabled >Pilih Jenis Pengiriman</option>
-                                            <option value={"pickup"}>Ambil di toko</option>
-                                            {
-                                                getDistanceFromLatLonInKm(storeGeoLoc.lat, 
-                                                    storeGeoLoc.lng, selectedAddress.lat,
-                                                     selectedAddress.lng).toFixed(1) < 5 ? 
+                                                    <h3 className="font-bold text-lg text-center">Pilih Alamat Pengiriman</h3>
+                                                
+                                                    {
+                                                        address.map((data) => {
+                                                            return (
+                                                                <ShipAddress 
+                                                                key={data.id}
+                                                                address={data}
+                                                                onSelected={setSelectedAddress}
+                                                                />
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            </>
 
-                                                     <option value={'delivery order'}>Pesan Antar</option>
-                                                     : 
-                                                     <option value={''} disabled>Pesan Antar (Jarak Pengiriman &lt; 5 KM)</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='flex grow mx-8 h-72 rounded p-4 flex-col shadow'>
-                                <div>
-                                    <div className='font-bold text-lg'>Ringkasan Belanja</div>
-                                    <div className='text-sm'>
-                                        <div className='font-bold mt-4'>Total Belanja</div>
-                                        <div className='opacity-70 flex justify-between'>
-                                            <span>
-                                                Total Harga : ({`${orderSummary?.totalQty} Barang`})
-                                            </span>
-                                            <span>
-                                                Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}
-                                            </span>
+                                        }
+                                        <div className='bg-base-100 rounded p-3 mt-3'>
+                                            <div className=''>Opsi Pengiriman</div>
+                                            <div className="divider my-1"></div>
+                                            <select className="select select-bordered w-full md:max-w-xs"
+                                                name='shipping_method'
+                                            >
+                                                <option disabled >Pilih opsi pengiriman</option>
+                                                <option value={"pickup"}>Ambil di toko</option>
+                                                {
+                                                    // Jarak pengiriman kurang dari 5m
+                                                    getDistanceFromLatLonInKm(storeGeoLoc.lat, 
+                                                        storeGeoLoc.lng, selectedAddress.lat,
+                                                        selectedAddress.lng).toFixed(1) < 5 ? 
+
+                                                        <option value={'delivery_order'}>Pesan antar</option>
+                                                        : 
+                                                        <option value={''} disabled>Pesan antar</option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
-                                    <div className="divider"></div>
-                                    <div className='font-bold flex justify-between'>
-                                        Total Tagihan
-                                        <span>Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}</span>
+                                    <div className='bg-base-100 p-3 mt-3 rounded'>
+                                        <div className=''>Produk yang dibeli</div>
+                                        <div className="divider my-1"></div>
+                                        {
+                                            product?.map((data,idx) => {
+                                                orderSummary.totalQty += data?.qty;
+                                                orderSummary.totalPrice += (data?.price * data?.qty)
+                                                return (
+                                                    <>
+                                                        <div className='flex mb-3' key={idx}>
+                                                            <div className="avatar">
+                                                                <div className="w-16 h-16 rounded-xl">
+                                                                    <img src={data?.url_img} alt="foto produk"/>
+                                                                </div>
+                                                            </div>
+                                                            <div className='ml-3 grow flex flex-col'>
+                                                                <p className='text-ellipsis font-bold uppercase '>{data?.name}</p>
+                                                                <div className='flex justify-between flex-wrap mt-1 items-center'>
+                                                                    <div className='text-sm font-bold'>
+                                                                       {data?.qty}
+                                                                        x Rp{rupiahFormat(data?.price)}
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                                <div className='flex justify-between items-center'>
+                                                                    <p className='mt-3 font-bold'>Rp{rupiahFormat(data?.price * data?.qty)}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })
+                                        }
                                     </div>
-                                    <button 
-                                    type='submit'
-                                    className='btn btn-secondary w-full text-base-100 normal-case my-8'>
-                                            Bayar
-                                    </button>
+                                    <div className='bg-base-100 p-3 mt-3 rounded'>
+                                        <div className=''>Pesan</div>
+                                        <div className="divider my-1"></div>
+                                        <textarea className="textarea w-full textarea-bordered mt-1" placeholder="Silahkan tinggalkan pesan"
+                                        name='notes'
+                                            
+                                        ></textarea>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                                <div className='flex grow h-72 flex-col md:ml-3 mt-3 md:mt-0'>
+                                    <div className='bg-base-100 rounded  p-3'>
+                                        <div className='font-bold'>Ringkasan Belanja</div>
+                                        <div className="divider my-1"></div>
+                                        <div className=''>
+                                            <div className='opacity-70 flex justify-between'>
+                                                <span>
+                                                    Total Belanja : ({`${orderSummary?.totalQty} Barang`})
+                                                </span>
+                                                <span>
+                                                    Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="divider my-1"></div>
+                                        <div className='font-bold flex justify-between'>
+                                            Total Tagihan
+                                            <span>Rp{new Intl.NumberFormat(['ban', 'id']).format(orderSummary?.totalPrice)}</span>
+                                        </div>
+                                        <button 
+                                        type='submit'
+                                        className='btn btn-secondary w-full text-base-100 normal-case my-8'>
+                                                Buat Pesanan
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div> 
+                    :
+                    <div className='flex mt-10 justify-center flex-col items-center'>                
+                        <img src={notFoundImg} 
+                        className='h-28'
+                        alt='not-found-img'/>
+                        <div className='mt-2'>Halaman tidak ditemukan</div>
                     </div>
-
-                </div> : <div>Halaman Tidak Ditemukan</div>
-            }
+                }
+            </div>
         </>
     )
 }
