@@ -15,8 +15,11 @@ export default function Checkout() {
     const getCustAddress = async (url) => await axios.get(url).then((res) => res.data.data);
     const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress)
     const [products, setProducts] = useState(location.state?.products);
+    const [shipMethod, setShipMethod] = useState('pickup');
     const [selectedAddress, setSelectedAddress] = useState('');
+    const [validOrder, setValidOrder] = useState(true);
     const [deliveryOrder, setDeliveryOrder] = useState(false);
+    console.log(selectedAddress);
     const orderSummary = {
         totalQty : 0,
         totalPrice : 0
@@ -68,10 +71,20 @@ export default function Checkout() {
                                             defaultValue={"pickup"}
                                         >
                                             <option value={"pickup"}
-                                                onClick={() => setDeliveryOrder(false)}
+                                                onClick={() => {
+                                                    setShipMethod('pickup')
+                                                    setDeliveryOrder(false)
+                                                    setValidOrder(true)
+                                                }}
                                             >Ambil di toko</option>
                                             <option value={'delivery_order'}
-                                                onClick={() => setDeliveryOrder(true)}
+                                                onClick={() => {
+                                                    setShipMethod('delivery_order')
+                                                    setDeliveryOrder(true)
+                                                    if (!selectedAddress) {
+                                                        setValidOrder(false);
+                                                    } 
+                                                }}
                                             >Pesan Antar</option>
                                             {/* {
                                                 getDistanceFromLatLonInKm(storeGeoLoc.lat, 
@@ -86,8 +99,15 @@ export default function Checkout() {
                                     {
                                         deliveryOrder && 
                                         <div className='mt-3 '>
+                                            <div 
+                                            className='flex flex-col bg-base-100 border-primary border p-3 w-full rounded mb-3'>
+                                                <div className='font-bold text-sm'>Rizki Plastik</div>
+                                                <div className='text-xs opacity-70'>
+                                                    Jl. Puri Cendana No.112, Sumberjaya, Kec. Tambun Sel., Kabupaten Bekasi, Jawa Barat 17510
+                                                </div>
+                                            </div>
                                             {
-                                                address?.length < 1 && 
+                                                address?.length < 1 ?
                                                 <Link 
                                                 to={'/customers/address/new'}
                                                 className='border text-secondary border-dashed
@@ -98,9 +118,7 @@ export default function Checkout() {
                                                         Tambah Alamat Pengiriman
                                                     </div>
                                                 </Link> 
-                                            }
-                                            {
-                                                address?.length > 1 &&
+                                                :
                                                 <>
                                                     <ModalSelectAddress
                                                             address = {address}
@@ -108,6 +126,7 @@ export default function Checkout() {
                                                     />
                                                 </>
                                             }
+                                           
                                         
                                         </div>
                                     }
@@ -174,11 +193,22 @@ export default function Checkout() {
                                             Total Tagihan
                                             <span>Rp{rupiahFormat(orderSummary?.totalPrice)}</span>
                                         </div>
-                                        <button 
-                                        type='submit'
-                                        className='btn btn-secondary w-full text-base-100 normal-case my-8'>
-                                                Buat Pesanan
-                                        </button>
+                                        {
+                                            validOrder ?   
+                                            <button 
+                                            type='submit'
+                                            className='btn btn-secondary w-full text-base-100 normal-case my-8'>
+                                                    Buat Pesanan
+                                            </button>
+                                            :
+
+                                            <button 
+                                            disabled
+                                            type='submit'
+                                            className='btn btn-disabled w-full text-base-100 normal-case my-8'>
+                                                    Buat Pesanan
+                                            </button>
+                                        }
                                     </div>
                                 </div>
                             </form>

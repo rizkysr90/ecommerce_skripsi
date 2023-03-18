@@ -109,15 +109,14 @@ export default function ShippingAddressNew() {
             isLoading = {isLoading}
         />
         <ToastContainer/>
-        <div className='mx-24 mt-6 '>
-            <div className='font-bold text-lg'>Alamat Pengiriman</div>
+        <div className='pt-20 mx-3 md:mx-14'>
             <form className=''
                 onSubmit={handleSubmit}
             >
-                <div className='flex'>
-                    <div className='mt-6 basis-2/5'>
-                        <p className='font-bold text-lg'>Data Pribadi</p>
-                        <div className="divider"></div> 
+                <div className='flex flex-col md:flex-row'>
+                    <div className='basis-2/5'>
+                        <p className='font-bold text-lg'>Kontak</p>
+                        <div className="divider my-1"></div> 
                         <div className='flex flex-col'>
                             <div className="form-control">
                                 <label className="label" htmlFor='recipient_name'>
@@ -140,14 +139,10 @@ export default function ShippingAddressNew() {
                                     className="input input-bordered w-full" />
                             </div>
                         </div>
-                        <div className='h-12'>
-
-                          
-                        </div>
                     </div>
-                    <div className='mt-6 basis-2/5 ml-8' >
-                        <p className='font-bold text-lg'>Data Alamat</p>
-                        <div className="divider"></div> 
+                    <div className='mt-4 md:mt-0 basis-2/5 md:ml-8' >
+                        <p className='font-bold text-lg'>Alamat</p>
+                        <div className="divider my-1"></div> 
                         <div className='flex flex-col'>
                             <div className="form-control">
                                 <label className="label" htmlFor='street'>
@@ -294,11 +289,16 @@ export default function ShippingAddressNew() {
                                     className="input input-bordered w-full" />
                             </div>
                             {/* The button to open modal */}
-                            <label htmlFor="my-modal-3"
-                            className="btn mt-4 normal-case btn-outline btn-secondary"
-                            onClick={getGeoLocation}
-                            >Atur otomatis alamat pada peta
-                            </label>
+                            {
+                                location.coordinates?.lat && location.coordinates?.lng ? 
+                                null :
+                                <label htmlFor="my-modal-3"
+                                className="btn mt-4 normal-case btn-outline btn-secondary"
+                                onClick={getGeoLocation}
+                                >Atur Alamat Maps
+                                </label>
+
+                            }
                             {/* Put this part before </body> tag */}
                             <input type="checkbox" id="my-modal-3" className="modal-toggle" />
                             <div className="modal">
@@ -310,9 +310,9 @@ export default function ShippingAddressNew() {
                             </div>
                            {
                             location.coordinates?.lat && location.coordinates?.lng ? 
-                            <div className="alert bg-base-100">
-                                <div>
-                                    <FontAwesomeIcon icon={faCheckCircle} className="text-success"/>
+                            <div className=" p-0 mt-3">
+                                <div className='flex text-left items-center'>
+                                    <FontAwesomeIcon icon={faCheckCircle} className="text-success mr-2"/>
                                     <span>Berhasil mendapatkan akses lokasi</span>
                                 </div>
                             </div>
@@ -333,9 +333,16 @@ export default function ShippingAddressNew() {
                 </div>
                 <div className='divider'></div>
                
-                <div className='flex justify-end mb-10'>
-                    <button className='btn btn-primary' type='submit'>Simpan data</button>
-                </div>
+               {
+                location.coordinates?.lat && location.coordinates?.lng ?  
+                    <div className='flex justify-end mb-10'>
+                        <button className='btn btn-primary normal-case w-full md:w-auto' type='submit'>Simpan Alamat</button>
+                    </div>
+                    :
+                    <div className='flex justify-end mb-10'>
+                        <button className='btn btn-disabled normal-case w-full md:w-auto' type='submit' disabled>Simpan Alamat</button>
+                    </div>
+               }
             </form>
         </div>
     </>

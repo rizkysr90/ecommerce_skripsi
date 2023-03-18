@@ -1,6 +1,6 @@
 import React from 'react'
-
-export default function ShipAddress({address, onSelected, isNoAction, ohyeah}) {
+import { Link } from 'react-router-dom'
+export default function ShipAddress({address, onSelected, isNoAction, close}) {
 
   return (
         
@@ -15,9 +15,11 @@ export default function ShipAddress({address, onSelected, isNoAction, ohyeah}) {
                   </div>
                   {
                     isNoAction ? null :
-                    <div className='text-info btn btn-ghost btn-xs normal-case'>
-                            Ubah
-                    </div>
+                    <Link 
+                    to='/customers/address'
+                    className='text-info btn btn-ghost btn-xs normal-case'>
+                            Ubah 
+                    </Link>
                   }
               </div>
               <div className='flex'>
@@ -32,7 +34,10 @@ export default function ShipAddress({address, onSelected, isNoAction, ohyeah}) {
                     isNoAction ? null :
                     <div className='mt-2 flex justify-end'>
                       <div className='btn btn-sm btn-primary normal-case'
-                        onClick={() => onSelected(address)}
+                        onClick={() => {
+                          onSelected(address)
+                          close((prev) => !prev)
+                        }}
                       >Pilih</div>
                     </div>
 
