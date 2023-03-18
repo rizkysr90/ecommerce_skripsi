@@ -164,17 +164,19 @@ export default function ProductDetails() {
                                 user ? 
                                 <div className='btn btn-secondary btn-outline text-black normal-case mt-2'
                                     onClick={() => {
-                                        navigate("/shopping-cart/direct-checkout", {
+                                        navigate("/cart/checkout", {
                                             state : {
                                                 products : [{
                                                     id : product?.id,
-                                                    qty : trackQty,
                                                     name : product?.name,
                                                     stock : product?.stock,
-                                                    price : product?.sell_price,
+                                                    sell_price : product?.sell_price,
                                                     product_weight : product?.product_weight,
                                                     shipping_weight : product?.shipping_weight,
-                                                    url_img : product?.url_img
+                                                    url_img : product?.url_img,
+                                                    Cart_detail : {
+                                                        qty : trackQty
+                                                    }
                                                 }
                                                 ]
                                             }

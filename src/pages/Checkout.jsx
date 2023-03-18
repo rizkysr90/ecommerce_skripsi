@@ -9,17 +9,19 @@ import {getDistanceFromLatLonInKm} from './../utility/haversine';
 import notFoundImg from '../media/undraw_page_not_found_re_e9o6.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { ToastContainer, toast } from 'react-toastify';
+import override from '../styles/spinner';
+import { ClipLoader } from 'react-spinners';
 
 export default function Checkout() {
     const location = useLocation();
     const getCustAddress = async (url) => await axios.get(url).then((res) => res.data.data);
-    const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress)
-    const [products, setProducts] = useState(location.state?.products);
-    const [shipMethod, setShipMethod] = useState('pickup');
+    const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress);
+    const [isLoading, setIsLoading] = useState(false);
+    const [products] = useState(location.state?.products);
     const [selectedAddress, setSelectedAddress] = useState('');
     const [validOrder, setValidOrder] = useState(true);
     const [deliveryOrder, setDeliveryOrder] = useState(false);
-    console.log(selectedAddress);
     const orderSummary = {
         totalQty : 0,
         totalPrice : 0
@@ -34,24 +36,62 @@ export default function Checkout() {
             const form = e.target;
             const formData = new FormData(form);
             const formJSON = Object.fromEntries(formData.entries());
-
+            if (formJSON.shipping_method === 'delivery_order' && deliveryOrder ){
+                // Todo 
+            }
             formJSON.amount = orderSummary.totalPrice;
             formJSON.qty_product = orderSummary.totalQty;
             formJSON.products = products;
-            console.log(formJSON)
-            const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON);
-            
+            setIsLoading(true)
+            const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON).then(res => res.data);
+            setIsLoading(false)
+            toast.success(`${res?.metadata?.msg}`);
+            setTimeout(() => {
+               
+            }, 3000);
         } catch (error) {
-            
+            let errFromServer = error?.response?.data?.metadata;
+            let errMsg = error.message;
+            if (error.response?.status !== 500) {
+                if (errFromServer?.msg) {
+                  errMsg = errFromServer?.msg;
+                } 
+            }
+            toast.error(`Error ${error?.response?.status} - ${errMsg}`);
+            setIsLoading(false);
         }
     }
     return (
         <>
+            {
+                isLoading &&
+                <div className='bg-base-100 fixed z-50 w-full left-0 top-0 right-0 min-h-screen'>
+                    <ClipLoader
+                    color={"#1eb854"}
+                    loading={isLoading}
+                    size={35}
+                    cssOverride={override}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                    />
+                </div>
+            }
+            <ToastContainer
+            autoClose={3000}
+            limit={1}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss={false}
+            draggable={false}
+            pauseOnHover
+            theme="dark"
+            />
             <div className='pt-20 bg-base-200 mx-3 md:mx-20 '>
                 {products ?  
                     <div className=''>
                         <div className=''>
-                            <div className='font-bold text-lg mb-4'>Checkout</div>
                             <form className="flex flex-col md:flex-row"
                                 onSubmit={handleSubmitOrder}
                             >
@@ -72,14 +112,12 @@ export default function Checkout() {
                                         >
                                             <option value={"pickup"}
                                                 onClick={() => {
-                                                    setShipMethod('pickup')
                                                     setDeliveryOrder(false)
                                                     setValidOrder(true)
                                                 }}
                                             >Ambil di toko</option>
                                             <option value={'delivery_order'}
                                                 onClick={() => {
-                                                    setShipMethod('delivery_order')
                                                     setDeliveryOrder(true)
                                                     if (!selectedAddress) {
                                                         setValidOrder(false);
@@ -101,7 +139,9 @@ export default function Checkout() {
                                         <div className='mt-3 '>
                                             <div 
                                             className='flex flex-col bg-base-100 border-primary border p-3 w-full rounded mb-3'>
-                                                <div className='font-bold text-sm'>Rizki Plastik</div>
+                                                <div className='text-sm font-bold'>Dikirim dari :</div>
+                                                <div className="divider my-0"></div>
+                                                <div className='text-sm'>Rizki Plastik</div>
                                                 <div className='text-xs opacity-70'>
                                                     Jl. Puri Cendana No.112, Sumberjaya, Kec. Tambun Sel., Kabupaten Bekasi, Jawa Barat 17510
                                                 </div>
@@ -123,6 +163,8 @@ export default function Checkout() {
                                                     <ModalSelectAddress
                                                             address = {address}
                                                             onSelected={setSelectedAddress}
+                                                            selectedAddress = {selectedAddress}
+                                                            validOrder = {setValidOrder}
                                                     />
                                                 </>
                                             }
@@ -136,6 +178,7 @@ export default function Checkout() {
 
                                         {
                                             products?.map((data, idx) => {
+                                                console.log(data);
                                                 orderSummary.totalQty += data?.Cart_detail?.qty;
                                                 orderSummary.totalPrice += (data?.sell_price * data?.Cart_detail?.qty)
                                                 return (

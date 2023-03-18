@@ -145,8 +145,8 @@ function DirectCheckout() {
                                                 orderSummary.totalQty += data?.qty;
                                                 orderSummary.totalPrice += (data?.price * data?.qty)
                                                 return (
-                                                    <>
-                                                        <div className='flex mb-3' key={idx}>
+                                                    <div key={idx}>
+                                                        <div className='flex mb-3' >
                                                             <div className="avatar">
                                                                 <div className="w-16 h-16 rounded-xl">
                                                                     <img src={data?.url_img} alt="foto produk"/>
@@ -166,7 +166,7 @@ function DirectCheckout() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </>
+                                                    </div>
                                                 )
                                             })
                                         }

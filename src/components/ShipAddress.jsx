@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-export default function ShipAddress({address, onSelected, isNoAction, close}) {
+export default function ShipAddress({address, onSelected, isNoAction, close, validOrder}) {
 
   return (
         
@@ -37,6 +37,7 @@ export default function ShipAddress({address, onSelected, isNoAction, close}) {
                         onClick={() => {
                           onSelected(address)
                           close((prev) => !prev)
+                          validOrder(true)
                         }}
                       >Pilih</div>
                     </div>
