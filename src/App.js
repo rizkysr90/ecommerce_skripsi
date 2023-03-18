@@ -21,6 +21,7 @@ import UserSettingsMob from './pages/UserSettingsMob';
 import SearchResult from './pages/SearchResult';
 import GroupByCategory from './pages/GroupByCategory';
 import AllProducts from './pages/AllProducts';
+import Payment from './pages/Payment';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/products/:productId" element={<ProductDetails/>}/>
             <Route path="/shopping-cart/direct-checkout" element={<DirectCheckout/>} />
             <Route path="/products" element={<AllProducts/>} />
+            <Route path="/payment" element={<Payment/>} />
           </Route>
         </Routes>
       </BrowserRouter>

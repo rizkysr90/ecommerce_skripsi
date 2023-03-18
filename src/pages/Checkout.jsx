@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import rupiahFormat from '../utility/rupiahFormat';
 import useSWR from 'swr'
 import axios from 'axios';
@@ -19,8 +19,10 @@ export default function Checkout() {
     const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress);
     const [isLoading, setIsLoading] = useState(false);
     const [products] = useState(location.state?.products);
+    const [paymentMethod, setPayment] =  useState('');
     const [selectedAddress, setSelectedAddress] = useState('');
     const [validOrder, setValidOrder] = useState(true);
+    const navigate = useNavigate();
     const [deliveryOrder, setDeliveryOrder] = useState(false);
     const orderSummary = {
         totalQty : 0,
@@ -37,17 +39,30 @@ export default function Checkout() {
             const formData = new FormData(form);
             const formJSON = Object.fromEntries(formData.entries());
             if (formJSON.shipping_method === 'delivery_order' && deliveryOrder ){
-                // Todo 
+                formJSON.lat = selectedAddress.lat;
+                formJSON.lng = selectedAddress.lng;
+                formJSON.shipping_distance = getDistanceFromLatLonInKm(storeGeoLoc.lat, 
+                                            storeGeoLoc.lng, selectedAddress.lat,
+                                            selectedAddress.lng).toFixed(1);
+                formJSON.shipping_address = `${selectedAddress.street}, ${selectedAddress.village}, ${selectedAddress.district}, ${selectedAddress.state}, ${selectedAddress.province}, ${selectedAddress.postal_code}`;
             }
             formJSON.amount = orderSummary.totalPrice;
             formJSON.qty_product = orderSummary.totalQty;
             formJSON.products = products;
-            setIsLoading(true)
+            setIsLoading(true);
             const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON).then(res => res.data);
             setIsLoading(false)
             toast.success(`${res?.metadata?.msg}`);
+            console.log(res.data);
             setTimeout(() => {
-               
+               if (paymentMethod !== 'cod') {
+                    navigate('/payment', {
+                        state : {
+                            orderId : res.data.orderId,
+                            amount : orderSummary.totalPrice
+                        }
+                    })
+               }
             }, 3000);
         } catch (error) {
             let errFromServer = error?.response?.data?.metadata;
@@ -172,13 +187,33 @@ export default function Checkout() {
                                         
                                         </div>
                                     }
+                                    <div className='bg-base-100 rounded p-3 mt-3'>
+                                        <div className=''>Opsi Pembayaran</div>
+                                        <div className="divider my-1"></div>
+                                        <div className="form-control">
+                                            <label className="label cursor-pointer">
+                                                <span className="label-text">Cash On Delivery (COD)</span> 
+                                                <input type="radio" name="status" 
+                                                value={'cod'} className="radio checked:bg-secondary" checked
+                                                    onChange={() => setPayment('cod')}
+                                                />
+                                            </label>
+                                            </div>
+                                            <div className="form-control">
+                                            <label className="label cursor-pointer">
+                                                <span className="label-text">Transfer</span> 
+                                                {/* value is '' because, it will be handle on BE */}
+                                                <input type="radio" name="status" value={'belum dibayar'} 
+                                                className="radio checked:bg-secondary" />
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div className='bg-base-100 p-3 mt-3 rounded'>
                                         <div className=''>Produk yang dibeli</div>
                                         <div className="divider my-1"></div>
 
                                         {
                                             products?.map((data, idx) => {
-                                                console.log(data);
                                                 orderSummary.totalQty += data?.Cart_detail?.qty;
                                                 orderSummary.totalPrice += (data?.sell_price * data?.Cart_detail?.qty)
                                                 return (
