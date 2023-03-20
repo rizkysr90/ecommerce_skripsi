@@ -59,9 +59,9 @@ export default function Register() {
                     <div className="divider my-1"></div>
                     <div className='mt-3 bg-base-100 p-3 rounded'>
                         {
-                            product?.length > 0 && product.map((data) => {
+                            product?.length > 0 && product.map((data,idx) => {
                                 return (
-                                    <>
+                                    <div key={idx}>
                                         <div className='flex mb-3'>
                                             
                                             <div className="avatar">
@@ -104,7 +104,7 @@ export default function Register() {
                                                 </div>
                                                 <div className='flex justify-between items-center'>
                                                     <input type="checkbox" id={`my-modal-${data?.id}`} className="modal-toggle"
-                                                        checked={limiterQty}
+                                                        checked={limiterQty} readOnly
                                                     />
                                                     <div className="modal modal-bottom sm:modal-middle">
                                                         <div className="modal-box">
@@ -135,7 +135,7 @@ export default function Register() {
                                             </div>
                                         </div>
                                         <div className="divider my-1"></div>
-                                    </>
+                                    </div>
                                 )
                             })
                         }

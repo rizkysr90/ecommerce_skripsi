@@ -22,6 +22,7 @@ import SearchResult from './pages/SearchResult';
 import GroupByCategory from './pages/GroupByCategory';
 import AllProducts from './pages/AllProducts';
 import Payment from './pages/Payment';
+import SuccessPayment from './pages/SuccessPayment';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
             <Route path="/shopping-cart/direct-checkout" element={<DirectCheckout/>} />
             <Route path="/products" element={<AllProducts/>} />
             <Route path="/payment" element={<Payment/>} />
+            <Route path="/payment/success" element={<SuccessPayment/>} />
           </Route>
         </Routes>
       </BrowserRouter>

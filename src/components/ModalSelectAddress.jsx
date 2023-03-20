@@ -18,7 +18,7 @@ export default function ModalSelectAddress(props) {
                 <div className="divider my-0"></div>
                 <div className='flex justify-between items-center'>
                     <div className=''>
-                        <div className='text-sm'>{props?.selectedAddress?.recipient_name}</div>
+                        <div className='text-sm'>{props?.selectedAddress?.recipient_name} | {props?.selectedAddress?.recipient_phone_number}</div>
                         <div className='text-xs opacity-70'>
                             {`${props?.selectedAddress?.street}, ${props?.selectedAddress?.village}, ${props?.selectedAddress?.district}, ${props?.selectedAddress?.state}, ${props?.selectedAddress?.province}, ${props?.selectedAddress?.postal_code}`}
                         </div>

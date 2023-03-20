@@ -19,7 +19,7 @@ export default function Checkout() {
     const {data : address} = useSWR(`${process.env.REACT_APP_API_HOST}/customers/address`, getCustAddress);
     const [isLoading, setIsLoading] = useState(false);
     const [products] = useState(location.state?.products);
-    const [paymentMethod, setPayment] =  useState('');
+    const [paymentMethod, setPayment] =  useState('cod');
     const [selectedAddress, setSelectedAddress] = useState('');
     const [validOrder, setValidOrder] = useState(true);
     const navigate = useNavigate();
@@ -44,8 +44,10 @@ export default function Checkout() {
                 formJSON.shipping_distance = getDistanceFromLatLonInKm(storeGeoLoc.lat, 
                                             storeGeoLoc.lng, selectedAddress.lat,
                                             selectedAddress.lng).toFixed(1);
-                formJSON.shipping_address = `${selectedAddress.street}, ${selectedAddress.village}, ${selectedAddress.district}, ${selectedAddress.state}, ${selectedAddress.province}, ${selectedAddress.postal_code}`;
+                formJSON.shipping_address 
+= `${selectedAddress?.recipient_name}^${selectedAddress?.recipient_phone_number}^${selectedAddress.street}^${selectedAddress.village}^${selectedAddress.district}^${selectedAddress.state}^${selectedAddress.province}^${selectedAddress.postal_code}`;
             }
+            formJSON.pay_method = paymentMethod;
             formJSON.amount = orderSummary.totalPrice;
             formJSON.qty_product = orderSummary.totalQty;
             formJSON.products = products;
@@ -53,15 +55,16 @@ export default function Checkout() {
             const res = await axios.post(`${process.env.REACT_APP_API_HOST}/onOrders`,formJSON).then(res => res.data);
             setIsLoading(false)
             toast.success(`${res?.metadata?.msg}`);
-            console.log(res.data);
             setTimeout(() => {
-               if (paymentMethod !== 'cod') {
+               if (paymentMethod === 'transfer') {
                     navigate('/payment', {
                         state : {
                             orderId : res.data.orderId,
                             amount : orderSummary.totalPrice
                         }
                     })
+               } else {
+                    navigate(`/customers/myorders/${res?.data?.orderId}`)
                }
             }, 3000);
         } catch (error) {
@@ -191,19 +194,30 @@ export default function Checkout() {
                                         <div className=''>Opsi Pembayaran</div>
                                         <div className="divider my-1"></div>
                                         <div className="form-control">
-                                            <label className="label cursor-pointer">
+                                            <label className="label cursor-pointer"
+                                                htmlFor='cod'
+                                            >
                                                 <span className="label-text">Cash On Delivery (COD)</span> 
                                                 <input type="radio" name="status" 
-                                                value={'cod'} className="radio checked:bg-secondary" checked
+                                                id='cod'
+                                                checked={paymentMethod === 'cod'}
+                                                onSelect={() => setPayment('cod')}
+                                                value={'cod'} className="radio checked:bg-secondary" 
                                                     onChange={() => setPayment('cod')}
                                                 />
                                             </label>
                                             </div>
                                             <div className="form-control">
-                                            <label className="label cursor-pointer">
+                                            <label className="label cursor-pointer"
+                                                htmlFor='transfer'
+                                            >
                                                 <span className="label-text">Transfer</span> 
-                                                {/* value is '' because, it will be handle on BE */}
-                                                <input type="radio" name="status" value={'belum dibayar'} 
+                                                <input type="radio" name="status"
+                                                id='transfer'
+                                                onSelect={() => setPayment('transfer')}
+                                                 value={'belum dibayar'}
+                                                checked={paymentMethod === 'transfer'}
+                                                onChange={() => setPayment('transfer')} 
                                                 className="radio checked:bg-secondary" />
                                             </label>
                                         </div>
