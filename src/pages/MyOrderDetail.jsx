@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import rupiahFormat from '../utility/rupiahFormat';
 moment.locale('id');
 
@@ -22,7 +22,7 @@ export default function MyOrderDetail() {
         '1' : 'Belum dibayar',
         '2' : 'Menunggu verifikasi',
         '3' : 'Diproses',
-        '4' : 'Selesai',
+        '4' :  order?.shipping_method === 'pickup' ? 'Siap dipickup' : 'Selesai',
     }
     if (order?.status === 'belum dibayar' || order?.status === 'cod') {
         stepOrder.current = 1
@@ -30,7 +30,7 @@ export default function MyOrderDetail() {
         stepOrder.current =  2
     } else if (order?.status === 'diproses') {
         stepOrder.current = 3
-    } else if (order?.status === 'selesai') {
+    } else if (order?.status === 'selesai' || order?.status === 'ready_to_pickup') {
         stepOrder.current = 4
     }
     
@@ -43,14 +43,13 @@ export default function MyOrderDetail() {
                     {
                         order && 
                         <div>
-                            <div className='p-3 shadow'>
+                            <div className='p-3 shadow bg-base-100'>
                                 <ul className="steps text-sm w-full">
                                     {
 
                                         Array.from({length: 4}, (_, i) => i + 1).map((elm, idx) => {
                                            
                                             let iteration = idx + 1;
-                                            console.log(stepOrder.c);
                                             if (iteration <= stepOrder.current) {
                                                 return (
                                                     <li className="step step-primary" key={idx}>{stepOrderInfo[String(iteration)]}</li>
@@ -63,6 +62,38 @@ export default function MyOrderDetail() {
                                         })
                                     }
                                 </ul>
+                                {
+                                    order?.status === 'diproses' &&
+                                    <div className='alert alert-success p-1 px-3 text-sm mt-3 text-base-100'>
+                                        <p className='flex'>
+                                            <FontAwesomeIcon icon={faCheckCircle} className='text-base-100 text-2xl'/>
+                                            Pesanan kamu sudah dikonfirmasi oleh admin dan sedang diproses.</p>
+                                    </div>
+                                }
+                                {
+                                    order?.status === 'dibayar' &&
+                                    <div className='alert alert-success p-1 px-3 text-sm mt-3 text-base-100'>
+                                        <p className='flex'>
+                                            <FontAwesomeIcon icon={faCheckCircle} className='text-base-100 text-2xl'/>
+                                            Pesanan dan pembayaran kamu sedang dikonfirmasi oleh admin.</p>
+                                    </div>
+                                }
+                                {
+                                    order?.status === 'selesai' &&
+                                    <div className='alert alert-success p-1 px-3 text-sm mt-3 text-base-100'>
+                                        <p className='flex'>
+                                            <FontAwesomeIcon icon={faCheckCircle} className='text-base-100 text-2xl'/>
+                                            Terima kasih, pesanan mu telah selesai.</p>
+                                    </div>
+                                }
+                                 {
+                                    order?.status === 'ready_to_pickup' &&
+                                    <div className='alert alert-success p-1 px-3 text-sm mt-3 text-base-100'>
+                                        <p className='flex'>
+                                            <FontAwesomeIcon icon={faCheckCircle} className='text-base-100 text-2xl'/>
+                                            Pesanan kamu sudah siap, silahkan pickup di toko.</p>
+                                    </div>
+                                }
                                 <div className='font-bold text-base mt-3'>Detail Transaksi</div>
                                 <div className="divider my-1"></div>
                                 <div className='flex text-sm justify-between w-full '>
@@ -82,6 +113,10 @@ export default function MyOrderDetail() {
                                     {
                                         order?.status === 'diproses' &&
                                         <div className='badge badge-success badge-outline badge-sm'>Diproses</div>
+                                    }
+                                    {
+                                        order?.status === 'ready_to_pickup' &&
+                                        <div className='badge badge-success badge-outline badge-sm'>Siap dipickup</div>
                                     }
                                     {
                                         order?.status === 'selesai' &&

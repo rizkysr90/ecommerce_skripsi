@@ -42,9 +42,21 @@ export default function MyOrders() {
                                       data?.status === 'dibayar' &&
                                       <div className='badge badge-success badge-outline badge-sm'>Menunggu verifikasi</div>
                                   }
-                                    {
+                                  {
                                       data?.status === 'cod' &&
                                       <div className='badge badge-success badge-outline badge-sm'>Belum dibayar</div>
+                                  }
+                                  {
+                                      data?.status === 'diproses' &&
+                                      <div className='badge badge-success badge-outline badge-sm'>Diproses</div>
+                                  }
+                                  {
+                                      data?.status === 'ready_to_pickup' &&
+                                      <div className='badge badge-success badge-outline badge-sm'>Siap dipickup</div>
+                                  }
+                                   {
+                                      data?.status === 'selesai' &&
+                                      <div className='badge badge-success badge-outline badge-sm'>Selesai</div>
                                   }
                                 <div className='flex'>
                                   <div className='badge badge-info badge-outline badge-sm mt-2'>{data?.pay_method}</div>
