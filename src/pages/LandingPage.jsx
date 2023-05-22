@@ -65,21 +65,6 @@ export default function LandingPage() {
             <SwiperSlide>
               <Banner />
             </SwiperSlide>
-            <SwiperSlide>
-              <Banner />
-            </SwiperSlide>
-            <SwiperSlide>
-              <Banner />
-            </SwiperSlide>
-            <SwiperSlide>
-              <Banner />
-            </SwiperSlide>
-            <SwiperSlide>
-              <Banner />
-            </SwiperSlide>
-            <SwiperSlide>
-              <Banner />
-            </SwiperSlide>
           </Swiper>
         </div>
         <div className="mt-4  p-4 rounded-lg bg-base-100">
