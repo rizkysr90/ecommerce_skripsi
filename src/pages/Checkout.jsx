@@ -164,8 +164,11 @@ export default function Checkout() {
                       </option>
                       <option
                         value={"delivery_order"}
-                        onClick={() => {
+                        onClick={async () => {
                           setDeliveryOrder(true);
+                          await axios.get(
+                            `${process.env.REACT_APP_API_HOST}/tes`
+                          );
                           if (!selectedAddress) {
                             setValidOrder(false);
                           }
