@@ -151,10 +151,7 @@ export default function Checkout() {
                     <select
                       className="select select-bordered w-full md:max-w-xs"
                       name="shipping_method"
-                      onChange={async (e) => {
-                        await axios.get(
-                          `${process.env.REACT_APP_API_HOST}/tes`
-                        );
+                      onChange={(e) => {
                         if (e.target.value === "delivery_order") {
                           setDeliveryOrder(true);
                           if (!selectedAddress) {
@@ -256,7 +253,7 @@ export default function Checkout() {
                       </label>
                     </div>
                   </div>
-                  <div>
+                  <div className="bg-base-100 rounded p-3 mt-3">
                     <div className="flex flex-col">
                       Nomor Whatsapp{" "}
                       <span className="text-sm">
