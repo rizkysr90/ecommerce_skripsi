@@ -151,31 +151,24 @@ export default function Checkout() {
                     <select
                       className="select select-bordered w-full md:max-w-xs"
                       name="shipping_method"
-                      defaultValue={"pickup"}
-                    >
-                      <option
-                        value={"pickup"}
-                        onClick={() => {
-                          setDeliveryOrder(false);
-                          setValidOrder(true);
-                        }}
-                      >
-                        Ambil di toko
-                      </option>
-                      <option
-                        value={"delivery_order"}
-                        onClick={async () => {
+                      onChange={async (e) => {
+                        await axios.get(
+                          `${process.env.REACT_APP_API_HOST}/tes`
+                        );
+                        if (e.target.value === "delivery_order") {
                           setDeliveryOrder(true);
-                          await axios.get(
-                            `${process.env.REACT_APP_API_HOST}/tes`
-                          );
                           if (!selectedAddress) {
                             setValidOrder(false);
                           }
-                        }}
-                      >
-                        Pesan Antar
-                      </option>
+                        } else {
+                          setDeliveryOrder(false);
+                          setValidOrder(true);
+                        }
+                      }}
+                      defaultValue={"pickup"}
+                    >
+                      <option value={"pickup"}>Ambil di toko</option>
+                      <option value={"delivery_order"}>Pesan Antar</option>
                       {/* {
                                                 getDistanceFromLatLonInKm(storeGeoLoc.lat, 
                                                     storeGeoLoc.lng, selectedAddress.lat,
