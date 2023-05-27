@@ -1,15 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import LoadSpinner from "../components/LoadSpinner";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function ShippingAddress() {
   const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   useEffect(() => {
     const getData = async () => {
       try {
@@ -23,8 +26,11 @@ export default function ShippingAddress() {
         setIsLoading(false);
       }
     };
+    if (!user) {
+      navigate("/");
+    }
     getData();
-  }, []);
+  }, [user, navigate]);
   return (
     <>
       <LoadSpinner isLoading={isLoading} />

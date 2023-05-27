@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import rupiahFormat from "../utility/rupiahFormat";
 import useSWR from "swr";
@@ -11,8 +11,11 @@ import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import override from "../styles/spinner";
 import { ClipLoader } from "react-spinners";
+import { useSelector } from "react-redux";
 
 export default function Checkout() {
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const location = useLocation();
   const getCustAddress = async (url) =>
     await axios.get(url).then((res) => res.data.data);
@@ -26,7 +29,6 @@ export default function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [validOrder, setValidOrder] = useState(true);
-  const navigate = useNavigate();
   const [deliveryOrder, setDeliveryOrder] = useState(false);
   const orderSummary = {
     totalQty: 0,
@@ -43,6 +45,20 @@ export default function Checkout() {
       const formData = new FormData(form);
       const formJSON = Object.fromEntries(formData.entries());
       if (formJSON.shipping_method === "delivery_order" && deliveryOrder) {
+        if (
+          getDistanceFromLatLonInKm(
+            storeGeoLoc.lat,
+            storeGeoLoc.lng,
+            selectedAddress.lat,
+            selectedAddress.lng
+          ).toFixed(1) > 8
+        ) {
+          setIsLoading(false);
+          toast.error(
+            `Jarak alamat pengiriman melebihi batas jarak pesan antar`
+          );
+          return;
+        }
         formJSON.lat = selectedAddress.lat;
         formJSON.lng = selectedAddress.lng;
         formJSON.shipping_distance = getDistanceFromLatLonInKm(
@@ -88,6 +104,11 @@ export default function Checkout() {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [navigate, user]);
   return (
     <>
       {isLoading && (

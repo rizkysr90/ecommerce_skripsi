@@ -4,7 +4,8 @@ import useSWR from "swr";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { logoutUser } from "../features/authSlice";
+import { logoutUser, forceLogout } from "../features/authSlice";
+
 import { useDispatch } from "react-redux";
 function Cart() {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ function Cart() {
   useEffect(() => {
     if (error) {
       dispatch(logoutUser());
+      dispatch(forceLogout());
     }
   }, [error, dispatch]);
   return (

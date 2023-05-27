@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 import useSWR from "swr";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
@@ -7,9 +7,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import rupiahFormat from "../utility/rupiahFormat";
 import waButton from "./../media/WhatsAppButtonGreenSmall.png";
+import { useSelector } from "react-redux";
+
 moment.locale("id");
 
 export default function MyOrderDetail() {
+  const { user } = useSelector((state) => state.auth);
+
   const { id } = useParams();
   const navigate = useNavigate();
   const fetchOrder = async (url) =>
@@ -43,7 +47,11 @@ export default function MyOrderDetail() {
   ) {
     stepOrder.current = 4;
   }
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [navigate, user]);
   return (
     <>
       <div className="pt-20 bg-base-200 mx-3 md:mx-20 ">
@@ -133,7 +141,7 @@ export default function MyOrderDetail() {
                   </div>
                 )}
                 {order?.status === "batal" && (
-                  <div className="badge badge-success badge-outline badge-sm">
+                  <div className="badge badge-error badge-outline badge-sm">
                     Batal
                   </div>
                 )}
