@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import rupiahFormat from "../utility/rupiahFormat";
 import useSWR from "swr";
 import axios from "axios";
@@ -209,8 +209,14 @@ export default function Checkout() {
                         </div>
                       </div>
                       {address?.length < 1 ? (
-                        <Link
-                          to={"/customers/address/new"}
+                        <div
+                          onClick={() => {
+                            navigate("/customers/address/new", {
+                              state: {
+                                products: products,
+                              },
+                            });
+                          }}
                           className="border text-secondary border-dashed
                                                 cursor-pointer
                                                 border-primary py-4 flex justify-center items-center rounded"
@@ -222,7 +228,7 @@ export default function Checkout() {
                             />
                             Tambah Alamat Pengiriman
                           </div>
-                        </Link>
+                        </div>
                       ) : (
                         <>
                           <ModalSelectAddress
@@ -339,7 +345,10 @@ export default function Checkout() {
                     })}
                   </div>
                   <div className="bg-base-100 p-3 mt-3 rounded md:mb-8">
-                    <div className="">Pesan</div>
+                    <div className="">
+                      Pesan{" "}
+                      <span className="text-xs font-bold">{`(Opsional)`}</span>
+                    </div>
                     <div className="divider my-1"></div>
                     <textarea
                       className="textarea w-full textarea-bordered mt-1"

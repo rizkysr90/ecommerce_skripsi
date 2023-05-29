@@ -35,7 +35,7 @@ export default function ShippingAddress() {
     <>
       <LoadSpinner isLoading={isLoading} />
       <div className="pt-20">
-        <div className="mt-4 mx-44 bg-base-100 rounded shadow py-4 px-8">
+        <div className="mt-4 mx-8 md:mx-44 bg-base-100 rounded shadow py-4 px-8">
           <div className="flex justify-between mt-4">
             <div className="text-lg font-bold">Alamat Saya</div>
             <Link

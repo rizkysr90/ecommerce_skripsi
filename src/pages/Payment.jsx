@@ -114,8 +114,8 @@ function Payment() {
             Rp{rupiahFormat(location.state?.amount)}
           </div>
           <div className="mt-4">Transfer ke alamat berikut :</div>
-          <div className="flex">BNI : 0909xxxx a.n Rizki Susilo Ramadhan</div>
-          <div className="flex">Shopeepay : 081283902294 a.n Rizki Plastik</div>
+          <div className="flex">BNI : 0909119629 a.n Rizki Susilo Ramadhan</div>
+          <div className="flex">Shopeepay : 081380816190 a.n Rizki Plastik</div>
           {previewImg && (
             <div className="indicator mt-8">
               <span

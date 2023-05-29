@@ -6,7 +6,7 @@ import useStateList from "../hooks/useStateList";
 import useVillageList from "../hooks/useVillageList";
 import LoadSpinner from "../components/LoadSpinner";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
@@ -15,8 +15,10 @@ import {
 import { useSelector } from "react-redux";
 
 export default function ShippingAddressNew() {
+  const useLoc = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const [products] = useState(useLoc.state?.products);
 
   const [getProvince, setGetProvince] = useState([]);
   const [trackProvinceId, setTrackProvinceId] = useState("");
@@ -70,7 +72,15 @@ export default function ShippingAddressNew() {
         formJSON
       );
       setIsLoading(false);
-      navigate("/customers/address");
+      if (products) {
+        navigate("/cart/checkout", {
+          state: {
+            products: products,
+          },
+        });
+      } else {
+        navigate("/customers/address");
+      }
     } catch (error) {
       setIsLoading(false);
       let errMsg = "Internal Server Error";
