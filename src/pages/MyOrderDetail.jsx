@@ -35,9 +35,9 @@ export default function MyOrderDetail() {
     3: "Diproses",
     4: order?.shipping_method === "pickup" ? "Siap dipickup" : "Selesai",
   };
-  if (order?.status === "belum dibayar" || order?.status === "cod") {
+  if (order?.status === "belum dibayar") {
     stepOrder.current = 1;
-  } else if (order?.status === "dibayar") {
+  } else if (order?.status === "dibayar" || order?.status === "cod") {
     stepOrder.current = 2;
   } else if (order?.status === "diproses") {
     stepOrder.current = 3;
