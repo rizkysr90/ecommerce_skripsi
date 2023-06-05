@@ -40,7 +40,7 @@ export const Navbar = () => {
   };
   return (
     <>
-      <div className="navbar bg-primary fixed top-0 z-50 py-2 px-1  lg:px-20 ">
+      <div className="navbar bg-base-100  fixed top-0 z-50 py-2 px-1  lg:px-20 ">
         <div className="navbar-start w-auto md:w-1/2">
           <Link
             to="/"
@@ -55,11 +55,6 @@ export const Navbar = () => {
                     "
               tabIndex={0}
             >
-              <FontAwesomeIcon
-                icon={faBoxesStacked}
-                className="hidden md:block"
-              />
-              <FontAwesomeIcon icon={faBars} className="block md:hidden h-6" />
               <span className="ml-1 hidden md:block">Kategori</span>
               <FontAwesomeIcon
                 icon={faCaretDown}
@@ -90,7 +85,7 @@ export const Navbar = () => {
             <input
               value={search}
               placeholder="Cari produk"
-              className="input input-sm w-full rounded-lg"
+              className="input input-sm input-bordered w-full rounded-lg"
               onChange={(e) => {
                 setSearch(e.target.value);
               }}

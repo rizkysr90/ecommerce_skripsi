@@ -239,7 +239,8 @@ export default function MyOrderDetail() {
                 </div>
               )}
               {order?.evidence_of_tf === null &&
-                order?.pay_method === "transfer" && (
+                order?.pay_method === "transfer" &&
+                order?.status !== "batal" && (
                   <div>
                     <div className="font-bold text-base mt-3">Pembayaran</div>
                     <div className="divider my-1"></div>

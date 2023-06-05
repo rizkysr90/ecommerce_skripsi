@@ -61,7 +61,31 @@ function Payment() {
     if (!user) {
       navigate("/");
     }
-  }, [navigate, user]);
+    let autoCancel = setTimeout(async () => {
+      try {
+        let getData = await axios
+          .get(
+            `${process.env.REACT_APP_API_HOST}/onOrders/${location.state?.orderId}`
+          )
+          .then((res) => res.data.data);
+        if (getData.status !== "batal" && getData.evidence_of_tf === null) {
+          await axios.delete(
+            `${process.env.REACT_APP_API_HOST}/onOrders/${location.state?.orderId}`
+          );
+        }
+        if (getData.status === "batal") {
+          navigate("/customers/myorders");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      return () => {
+        // Membersihkan timeout jika komponen tidak lagi digunakan
+        clearTimeout(autoCancel);
+      };
+      // 2 jam
+    }, 7200000);
+  }, [navigate, user, location.state?.orderId]);
   return (
     <>
       {isLoading && (
@@ -110,11 +134,15 @@ function Payment() {
         <div className="flex flex-col bg-base-100 rounded-lg p-3 items-center">
           <div>Transaksi ID : {location.state?.orderId} </div>
           <div className="font-bold text-lg">Menunggu pembayaran</div>
+          <div>
+            Anda mempunyai waktu 2 jam untuk melakukan pembayaran, sebelum
+            pesanan dibatalkan secara otomatis oleh sistem
+          </div>
           <div className="text-4xl font-bold mt-3">
             Rp{rupiahFormat(location.state?.amount)}
           </div>
           <div className="mt-4">Transfer ke alamat berikut :</div>
-          <div className="flex">BNI : 0909119629 a.n Rizki Susilo Ramadhan</div>
+          <div className="flex">Mandiri : 1560020653376 a.n Bambang Susilo</div>
           <div className="flex">Shopeepay : 081380816190 a.n Rizki Plastik</div>
           {previewImg && (
             <div className="indicator mt-8">
